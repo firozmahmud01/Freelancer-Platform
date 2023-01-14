@@ -101,7 +101,7 @@ export default function Main(){
                 </div>
                 
 
-                 <div style={{marginTop:'70%'}}>
+                 <div style={{marginTop:'40%'}}>
                     <Footer/>
                 </div>   
             </div>

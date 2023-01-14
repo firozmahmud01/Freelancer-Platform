@@ -1,24 +1,20 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import FormControl from '@material-ui/core/FormControl';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 
-const useStyles = makeStyles((theme) => ({
+import { createTheme } from '@mui/material/styles';
+import { Button, Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
+
+const useStyles = createTheme({
   formControl: {
-    margin: theme.spacing(2),
+    margin: 2,
   },
   saveButton: {
-    marginTop: theme.spacing(2),
+    marginTop: 2,
     
   },
   selectedSkills: {
-    marginTop: theme.spacing(2),
+    marginTop: 2,
   },
-}));
+});
 
 function SkillsPage({setAppBar}) {
 setAppBar(false);

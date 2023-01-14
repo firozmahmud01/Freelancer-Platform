@@ -14,37 +14,36 @@ import {
   Select,
   InputLabel,
   FormControl,
-  TextField
+  TextField,
+  createTheme
 } from '@mui/material';
-import { makeStyles } from '@material-ui/core';
 
 
-const useStyles = makeStyles
-((theme) => ({
+const useStyles = createTheme({
   root: {
     flexGrow: 1
   },
   tabs: {
-    borderRight: `1px solid ${theme.palette.divider}`,
+    borderRight: `1px solid black`,
   },
   tabContent: {
-    padding: theme.spacing(2),
+    padding: 2,
   },
   card: {
     height: '100%',
   },
   formControl: {
-    margin: theme.spacing(1),
+    margin: 1,
     minWidth: 120,
   },
   searchButton: {
-    margin: theme.spacing(1),
+    margin: 1,
   },
   cardContent: {
     display: 'flex',
     flexDirection: 'column',
   }
-}));
+});
 
 
 function SearchResultItem({ job }) {
