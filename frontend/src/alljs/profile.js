@@ -1,447 +1,144 @@
-import { Button, Checkbox, createTheme, FormControl, FormControlLabel, FormGroup, Typography } from '@mui/material';
-import React from 'react';
-
-
-const useStyles = createTheme({
-  formControl: {
-    margin: 2,
-  },
-  saveButton: {
-    marginTop: 2,
-    
-  },
-  selectedSkills: {
-    marginTop: 2,
-  },
-});
-
-function SkillsPage({setAppBar}) {
-setAppBar(false);
-  const classes = useStyles();
-  const [webDevelopmentSkills, setWebDevelopmentSkills] = React.useState([]);
-  const [graphicDesignSkills, setGraphicDesignSkills] = React.useState([]);
-  const [animationSkills, setAnimationSkills] = React.useState([]);
-  const [mobileDevelopmentSkills, setMobileDevelopmentSkills] = React.useState([]);
-  const [desktopDevelopmentSkills, setDesktopDevelopmentSkills] = React.useState([]);
-  const [photoEditingSkills, setPhotoEditingSkills] = React.useState([]);
-  
-  
-  const handleCancel = () => {
-    // resetForm();
-    // Navigate back to the previous page or perform some other cancel action
-  };
-
-  const handlePhotoEditingSkillChange = (event) => {
-    const newPhotoEditingSkills = event.target.value;
-    if (photoEditingSkills.includes(newPhotoEditingSkills)) {
-      setPhotoEditingSkills(photoEditingSkills.filter((skill) => skill !== newPhotoEditingSkills));
-    } else {
-      setPhotoEditingSkills([...photoEditingSkills, newPhotoEditingSkills]);
-    }
-  };
-  const handleWebDevelopmentSkillChange = (event) => {
-    const newSkills = [...webDevelopmentSkills];
-    if (event.target.checked) {
-      newSkills.push(event.target.value);
-    } else {
-      newSkills.splice(newSkills.indexOf(event.target.value), 1);
-    }
-    setWebDevelopmentSkills(newSkills);
-  };
-
-  const handleGraphicDesignSkillChange = (event) => {
-    const newSkills = [...graphicDesignSkills];
-    if (event.target.checked) {
-      newSkills.push(event.target.value);
-    } else {
-      newSkills.splice(newSkills.indexOf(event.target.value), 1);
-    }
-    setGraphicDesignSkills(newSkills);
-  };
-
-  const handleAnimationSkillChange = (event) => {
-    const newSkills = [...animationSkills];
-    if (event.target.checked) {
-      newSkills.push(event.target.value);
-    } else {
-      newSkills.splice(newSkills.indexOf(event.target.value), 1);
-    }
-    setAnimationSkills(newSkills);
-  };
-
-  const handleMobileDevelopmentSkillChange = (event) => {
-    const newSkills = [...mobileDevelopmentSkills];
-    if (event.target.checked) {
-      newSkills.push(event.target.value);
-    } else {
-      newSkills.splice(newSkills.indexOf(event.target.value), 1);
-    }
-    setMobileDevelopmentSkills(newSkills);
-};
-
-const handleDesktopDevelopmentSkillChange = (event) => {
-  const newSkills = [...desktopDevelopmentSkills];
-  if (event.target.checked) {
-    newSkills.push(event.target.value);
-  } else {
-    newSkills.splice(newSkills.indexOf(event.target.value), 1);
+import { Avatar, Card, CardMedia, Grid, Paper, Typography } from "@mui/material";
+import { useState } from "react"
+import { getprofiledetails } from "./AllApi"
+import ProfileBackPic from '../image/profileback.jpg'
+import { Box, Container } from "@mui/system";
+async function loadProfiledetails(setData,profile){
+  let data=await getprofiledetails(profile);
+  if(data){
+    setData(data);
   }
-  setDesktopDevelopmentSkills(newSkills);
-};
+}
 
-const handleSave = () => {
-  // Save the selected skills to the database
-};
-
-return (
-    <div style={{margin:'20px'}}>
-        <Typography variant='h4'>Choose all skill matchs to you:</Typography>
-  <React.Fragment>
-    <FormControl component="fieldset" className={classes.formControl}>
-      <Typography variant="h6">Web Development</Typography>
-      <FormGroup>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={webDevelopmentSkills.includes('html')}
-              onChange={handleWebDevelopmentSkillChange}
-              value="html"
-            />
-          }
-          label="HTML"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={webDevelopmentSkills.includes('css')}
-              onChange={handleWebDevelopmentSkillChange}
-              value="css"
-            />
-          }
-          label="CSS"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={webDevelopmentSkills.includes('javascript')}
-              onChange={handleWebDevelopmentSkillChange}
-              value="javascript"
-            />
-          }
-          label="JavaScript"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={webDevelopmentSkills.includes('react')}
-              onChange={handleWebDevelopmentSkillChange}
-              value="react"
-            />
-          }
-          label="React"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={webDevelopmentSkills.includes('nodejs')}
-              onChange={handleWebDevelopmentSkillChange}
-              value="nodejs"
-            />
-          }
-          label="Node.js"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={webDevelopmentSkills.includes('express')}
-                onChange={handleWebDevelopmentSkillChange}
-                value="express"
-              />
-            }
-            label="Express"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={webDevelopmentSkills.includes('mysql')}
-                onChange={handleWebDevelopmentSkillChange}
-                value="mysql"
-              />
-            }
-            label="MySQL"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={webDevelopmentSkills.includes('mongodb')}
-                onChange={handleWebDevelopmentSkillChange}
-                value="mongodb"
-              />
-            }
-            label="MongoDB"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={webDevelopmentSkills.includes('php')}
-                onChange={handleWebDevelopmentSkillChange}
-                value="php"
-              />
-            }
-            label="PHP"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={webDevelopmentSkills.includes('python')}
-                onChange={handleWebDevelopmentSkillChange}
-                value="python"
-              />
-            }
-            label="Python"
-          />
-        </FormGroup>
-      </FormControl>
-      <FormControl component="fieldset" className={classes.formControl}>
-        <Typography variant="h6">Graphic Design</Typography>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={graphicDesignSkills.includes('photoshop')}
-                onChange={handleGraphicDesignSkillChange}
-                value="photoshop"
-              />
-            }
-            label="Photoshop"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={graphicDesignSkills.includes('illustrator')}
-                onChange={handleGraphicDesignSkillChange}
-                value="illustrator"
-              />
-            }
-            label="Illustrator"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={graphicDesignSkills.includes('indesign')}
-                onChange={handleGraphicDesignSkillChange}
-                value="indesign"
-              />
-            }
-            label="InDesign"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={graphicDesignSkills.includes('affinitydesigner')}
-                onChange={handleGraphicDesignSkillChange}
-                value="affinitydesigner"
-              />
-            }
-            label="Affinity Designer"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={graphicDesignSkills.includes('coreldraw')}
-                onChange={handleGraphicDesignSkillChange}
-
-
-                value="coreldraw"
-              />
-            }
-            label="CorelDRAW"
-          />
-        </FormGroup>
-      </FormControl>
-      <FormControl component="fieldset" className={classes.formControl}>
-        <Typography variant="h6">Animation</Typography>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={animationSkills.includes('2danimation')}
-                onChange={handleAnimationSkillChange}
-                value="2danimation"
-              />
-            }
-            label="2D Animation"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={animationSkills.includes('3danimation')}
-                onChange={handleAnimationSkillChange}
-                value="3danimation"
-              />
-            }
-            label="3D Animation"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={animationSkills.includes('motiongraphics')}
-                onChange={handleAnimationSkillChange}
-                value="motiongraphics"
-              />
-            }
-            label="Motion Graphics"
-          />
-        </FormGroup>
-      </FormControl>
-      <FormControl component="fieldset" className={classes.formControl}>
-        <Typography variant="h6">Mobile Development</Typography>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={mobileDevelopmentSkills.includes('android')}
-                onChange={handleMobileDevelopmentSkillChange}
-                value="android"
-              />
-            }
-            label="Android"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={mobileDevelopmentSkills.includes('ios')}
-                onChange={handleMobileDevelopmentSkillChange}
-                value="ios"
-              />
-            }
-            label="iOS"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={mobileDevelopmentSkills.includes('reactnative')}
-                onChange={handleMobileDevelopmentSkillChange}
-                value="reactnative"
-              />
-            }
-            label="React Native"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={mobileDevelopmentSkills.includes('flutter')}
-                onChange={handleMobileDevelopmentSkillChange}
-                value="flutter"
-              />
-            }
-            label="Flutter"
-          />
-        </FormGroup>
-      </FormControl>
-      <FormControl component="fieldset" className={classes.formControl}>
-        <Typography variant="h6">Desktop Development</Typography>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={desktopDevelopmentSkills.includes('csharp')}
-                onChange={handleDesktopDevelopmentSkillChange}
-                value="csharp"
-              />
-            }
-            label="C#"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={desktopDevelopmentSkills.includes('java')}
-                onChange={handleDesktopDevelopmentSkillChange}
-                    value="java"
-                  />
-                }
-                label="Java"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={desktopDevelopmentSkills.includes('python')}
-                    onChange={handleDesktopDevelopmentSkillChange}
-                    value="python"
-                  />
-                }
-                label="Python"
-              />
-            </FormGroup>
-          </FormControl>
-          <FormControl component="fieldset" className={classes.formControl}>
-            <Typography variant="h6">Photo Editing</Typography>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={photoEditingSkills.includes('photoshop')}
-                    onChange={handlePhotoEditingSkillChange}
-                    value="photoshop"
-                  />
-                }
-                label="Photoshop"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={photoEditingSkills.includes('lightroom')}
-                    onChange={handlePhotoEditingSkillChange}
-                    value="lightroom"
-                  />
-                }
-                label="Lightroom"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={photoEditingSkills.includes('affinityphoto')}
-                    onChange={handlePhotoEditingSkillChange}
-                    value="affinityphoto"
-                  />
-                }
-                label="Affinity Photo"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={photoEditingSkills.includes('gimp')}
-                    onChange={handlePhotoEditingSkillChange}
-                    value="gimp"
-                  />
-                }
-                label="GIMP"
-              />
-            </FormGroup>
-          </FormControl>
-          <div className={classes.selectedSkills}>
-            <Typography variant="h6">Selected Skills:</Typography>
-            <Typography>
-              {webDevelopmentSkills.join(', ')}
-              {graphicDesignSkills.length > 0 && `, ${graphicDesignSkills.join(', ')}`}
-              {animationSkills.length > 0 && `, ${animationSkills.join(', ')}`}
-              {mobileDevelopmentSkills.length > 0 && `, ${mobileDevelopmentSkills.join(', ')}`}
-              {desktopDevelopmentSkills.length > 0 && `, ${desktopDevelopmentSkills.join(', ')}`}
-              {photoEditingSkills.length > 0 && `, ${photoEditingSkills.join(', ')}`}
-            </Typography>
-          </div>
-          <div className={classes.buttons}>
-            <Button variant="contained" style={{marginRight:'10px'}} color="primary" onClick={handleSave}>
-              Save
-            </Button>
-            <Button variant="contained" color="secondary" onClick={handleCancel}>
-              Cancel
-            </Button>
-          </div>
-        </React.Fragment>
+export default function Main(){
+  let profile=document.location.pathname.split('/')
+  profile=profile[profile.length-1]
+  if(profile=='profile')document.location='/'
+  const [data,setData]=useState(undefined);
+  // if(!data){
+  //   loadProfiledetails(setData,profile);
+  //   return <div></div>
+  // }
+  return <div>
+    <Card sx={{width:'100%'}}>
+      <CardMedia sx={{height:'350px'}} image={ProfileBackPic}></CardMedia>
+    </Card>
+    <div style={{width:'60%',marginLeft:'20%',backgroundColor:'white',padding:'32px',height:'200px',position:'absolute',top:'210px'}}>
+    <ProfileUpper img={'https://bauet.ac.bd/wp-content/uploads/2020/11/BAUET-Logo-250x244-1.png'} name={localStorage.getItem('name')} jobtitle={"Graphics Designer"} address={"BAUET, Nator"} details={"A graphic designer is a professional within the graphic design and graphic arts industry who assembles together images, typography, or motion graphics to create a piece of design. A graphic designer creates the graphics primarily for published, printed, or electronic media, such as brochures and advertising."} hourlyrate={'100৳/hour'}/>
+      
+    <Paper elevation={3} sx={{padding:'16px',margin:'32px'}}>
+        <Typography variant="h6"><b>Portfolio Items</b></Typography>
+        <div style={{margin:'32px'}}>
+          <Portfolio imgs={[ProfileBackPic,ProfileBackPic,ProfileBackPic,ProfileBackPic,
+          ProfileBackPic,ProfileBackPic,ProfileBackPic,ProfileBackPic]}/>
         </div>
-      );
-    };
+      </Paper>
+      
+      <Typography variant="h5"><b>Reviews</b></Typography>
+      <br></br>
+      <Typography variant="h6">No reviews yet!</Typography>
+
+          <br></br>
+          <br></br>
+          <Paper elevation={3} sx={{padding:'8px'}}>
+            <Typography variant="h5"><b>Experience</b></Typography>
+            </Paper>
+            <br></br>
+            <Paper elevation={3} sx={{padding:'8px'}}>
+            <ExperienceList/>
+            </Paper>
+            <br></br>
+          <br></br>
+          <Paper elevation={3} sx={{padding:'8px'}}>
+            <Typography variant="h5"><b>Education</b></Typography>
+            </Paper>
+            <br></br>
+            <Paper elevation={3} sx={{padding:'8px'}}>
+            <ExperienceItem title="BSC in CSE" time="Bangladesh Army University of Engineering and Technology" details="Jan 2019-Jun 2023"/>
+            </Paper>
+            <br></br>
+            <br></br>
+            <br></br>
+
+    </div>
+  </div>
+}
+
+function ExperienceList(){
+  let data=[{title:'Graphics Designer',time:'Jan 2018-Dec 2020',details:'I was working with a farm called \'Motion Graphic\' as a Graphics Designer'}]
+  return <ExperienceItem title={data[0].title} time={data[0].time} details={data[0].details}/>
+}
+
+function ExperienceItem({title,time,details}){
+  return (<div>
+    <Typography variant="h5">{title}</Typography>
+    <Typography variant="h6">{time}</Typography>
+    <Typography variant="h6">{details}</Typography>
+  </div>)
+}
+
+function Portfolio({imgs}){
+  let all=imgs.map((item,index)=>{
+    return (<Grid xs={3} item keys={index}>
+      <Card sx={{maxWidth:'200px'}}>
+        <CardMedia sx={{height:'200px'}} image={item}></CardMedia>
+      </Card>
+    </Grid>)
+  })
+  return (<Grid container spacing={3}>
+    {all}
+  </Grid>)
+}
+
+
+function ReviewItem({rating,name,review}){
+  return (
+  <div style={{marginTop:'10px'}}>
+      <Grid container>
+          <Grid item xs={12}>
+             
+              <Typography sx={{color:'red'}}>{(()=>{
+                  let star=rating;
+                  let res=""
+                  for(let i=0;i<star;i++){
+                      res+="★ "
+                  }
+                  return res;
+              })()}</Typography>
+          </Grid>
+          <Grid item xs={12}>
+              <Typography>by <b>{name}</b></Typography>
+          </Grid>
+          <Grid item xs={12}>
+              <Typography sx={{margin:'10px'}}>{review}</Typography>
+          </Grid>
+      </Grid>
+  </div>)
+}
+
+
+function ProfileUpper({img,name,jobtitle,address,details,hourlyrate}){
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs={2}>
+        <Card sx={{maxWidth:'150px'}}>
+          <CardMedia sx={{height:'150px'}} image={img}></CardMedia>
+        </Card>
+        <br></br>
+        <Typography variant="h6">{hourlyrate}</Typography>
+        <Typography variant="h6">{address}</Typography>
+      </Grid>
+
+      <Grid item xs={10}>
+        <Typography variant="h4">{name}</Typography>
+        <Typography>{jobtitle}</Typography>
+        <br></br>
+        <br></br>
+        <Typography variant="h6"> {details}</Typography>
+      </Grid>
+
     
-    export default SkillsPage;
-    
+
+    </Grid>
+  )
+}

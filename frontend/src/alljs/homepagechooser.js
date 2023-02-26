@@ -1,6 +1,9 @@
-import DefaultHomePage from './homepage'
-import WorkerHomePage from './workerhomepage'
+import DefaultHomePage from './defaulthomepage'
+import LoggedInHomepage from './loggedinhomepage'
 export default function Main({setAppBar}){
-    // return <WorkerHomePage setAppBar={setAppBar}/>
-    return <DefaultHomePage/>
+    if(localStorage.getItem('cookie')){
+        return <LoggedInHomepage setAppBar={setAppBar}/>
+    }else{
+        return <DefaultHomePage/>
+    }
 }
