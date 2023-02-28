@@ -82,6 +82,10 @@ exports.signupuser=async(name,email,pass,userType)=>{
         
     }
 
+    exports.uploadProfilePicture=async(pic)=>{
+        
+    }
+
     exports.cashinrequest=async(amount,number,refarencenumber)=>{
 
     }

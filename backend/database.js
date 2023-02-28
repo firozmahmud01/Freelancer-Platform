@@ -19,6 +19,10 @@ let con = mysql.createConnection({
       con.query("USE Freelancer");
     
     con.query("CREATE TABLE IF NOT EXISTS normaluser(uid INTEGER PRIMARY KEY AUTO_INCREMENT,name TEXT,email TEXT,pass TEXT,token TEXT,userType TEXT,balance INTEGER DEFAULT 0,img TEXT,profile TEXT DEFAULT 0,details TEXT,jobtitle TEXT,portfolio TEXT,experience TEXT,education TEXT);")
+
+
+                                                            // title,requirements,details,attachments,pricerange
+    con.query("CREATE TABLE IF NOT EXISTS projects(uid INTEGER PRIMARY KEY AUTO_INCREMENT,title TEXT,requirements TEXT,details TEXT,attachments TEXT,pricerange TEXT);")
     
     
     
@@ -48,7 +52,7 @@ exports.updateProfilePicture=async(pic,token)=>{
   if(name.length<=0){
     return ;
   }else{
-    await saveimage(pic,name);
+    await saveimage(pic,name[0].img);
     return 'OK';
   }
 }

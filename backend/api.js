@@ -1,5 +1,5 @@
 const express=require('express');
-const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails } = require('./database');
+const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture } = require('./database');
 const r=express.Router()
 module.exports= r;
 
@@ -47,70 +47,40 @@ r.post('/signup',async(req,res)=>{
 })
 
 
-    r.get('/foodlist',async(req,res)=>{
-        let {start,end}=req.query
-        if(!start||!end){
-            res.json({status:'Something is missing'})
-            return 
-        }
-        let data=await getfoodlist(start,end)
-        if(data){
-            res.json({status:"OK",data})
-        }else{
-            res.json({status:'No product found!!!'})
-        }
-        
-    })
+   
+r.post('/updateprofilepic',async(req,res)=>{
 
-    r.get('/productdetails',async(req,res)=>{
-        let {id}=req.query
-        if(!id){
-            res.json({status:'Something is missing'})
-            return 
-        }
+    const {cookie,image}=req.body;
+    if(!cookie||!image){
+        res.json({status:'Failed to load image!'});
+        return;
+    }
+    let data=await updateProfilePicture(image,cookie);
+    if(data){
+        res.json({status:'OK'})
+    }else{
+        res.json({status:'Failed to upload profile picture!'})
+    }
 
-        let data=await getfooddetails(id);
-        if(data){
-            res.json({status:'OK',data})
-        }else{
-            res.json({status:'No product found with this id!!!'})
-        }
-
-        
-    })
-
-    r.get('/babysitteritem',async(req,res)=>{
-        let {start,end}=req.query
-        if(!start||!end){
-            res.json({status:'Something is missing'})
-            return 
-        }
-        let data=await getbabysitteritem(start,end);
-        if(data){
-            res.json({status:'OK',data})
-        }else{
-            res.json({status:'No babysitter found for now'})
-        }
-        
-    })
-
-    r.get('/babysitterdetails',async(req,res)=>{
-        let {id}=req.query
-        if(!id){
-            res.json({status:'Something is missing'})
-            return 
-        }
+})
 
 
-        let data=await getbabysitterdetails(id);
-        if(data){
-            res.json({status:'OK',data})
-        }else{
-            res.json({status:'No babysitter found with this id!!!'})
-        }
 
-        
-    })
+    
+r.post('/uploadproject',async (req,res)=>{
+    let {title,requirements,details,attachments,pricerange}=req.body;
+    if(!title||!requirements||!details||!attachments||!pricerange){
+        res.json({status:'Failed to work with you'});
+        return ;
+    
+    }
+
+
+    
+})
+    
+
+    
 
 
     r.get('/search',async(req,res)=>{
@@ -123,31 +93,5 @@ r.post('/signup',async(req,res)=>{
         
     })
 
-    r.post('/addreview',async(req,res)=>{
-        let {star,comment,reviewertoken}=req.body
-        if(!star||!comment||!reviewertoken){
-            res.json({status:'Something is missing'})
-            return 
-        }
-        res.json({status:"OK"})
-        
-    })
-    r.post('/uploadfood',async(req,res)=>{
-        let {name,img,prize,brand,pointmsg,details,username,password}=req.body
-        if(!name||!img||!prize||!brand||!pointmsg||!details||!username||!password){
-            res.json({status:'You missied something'})
-            return 
-        }
-        if(username=='admin'&&password=='admin'){
-
-        let data=await uploadfood(name,img,prize,brand,pointmsg,details)
-        if(data){
-            res.json({status:'OK'})
-        }else{
-            res.json({status:'Failed to upload'})
-        }
-    }else{
-        res.json({status:'Wrong username or password'})
-    }
-
-    })
+    
+    
