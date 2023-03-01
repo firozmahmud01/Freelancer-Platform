@@ -1,11 +1,10 @@
 import { AccountBox, AddBox, AddCircleOutline, Delete, LibraryAdd } from "@mui/icons-material";
 import { Button, Card, CardMedia, Grid, IconButton, Paper, TextField, Typography } from "@mui/material";
 import { useState } from "react";
+import { getprofiledetails } from "./AllApi";
 
 
-async function loadProfileData(){
 
-}
 
 
 function imgToBase(url){
@@ -82,7 +81,7 @@ function PortfolioSection({images}){
     </Paper>
 }
 
-function PictureSection(){
+function PictureSection({img,portfolio}){
 return <div>
     <ProfilePictureSection/>
     
@@ -91,7 +90,7 @@ return <div>
 </div>
 }
 
-function ProfileSection(){
+function ProfileSection({names,emails,bios,details,hourlyrate}){
       const [name, setName] = useState('');
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
@@ -167,7 +166,7 @@ function ProfileSection(){
       );
         
 }
-function EducationSection(){
+function EducationSection({educat}){
     
       const [education, setEducation] = useState([
         { programName: '', schoolName: '', startYear: '', startMonth: '', endYear: '', endMonth: '', result: '' },
@@ -310,7 +309,7 @@ function EducationSection(){
 
 
 
-function ExperienceSection(){
+function ExperienceSection({exper}){
    
       const [experiences, setExperiences] = useState([
         { title: '', startYear: '', startMonth: '', endYear: '', endMonth: '', details: '' },
@@ -438,25 +437,32 @@ function ExperienceSection(){
 }
 
 export default function Main(){
+    const [data,setData]=useState()
+    if(!data){
+      getprofiledetails().then(da=>{
+        setData(da);
+      })
+      return <div></div>
+    }
 
     return (<Grid sx={{margin:'16px'}} container spacing={1}>
         <Grid item xs={12}><Typography variant="h5"><b>Picture Update Section:</b></Typography></Grid>
-        <Grid item xs={12}><PictureSection/></Grid>
+        <Grid item xs={12}><PictureSection img={data.img} portfolio={data.portfolio}/></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}><Typography variant="h5"><b>Profile Update Section:</b></Typography></Grid>
-        <Grid item xs={12}><ProfileSection/></Grid>
+        <Grid item xs={12}><ProfileSection names={data.name} emails={data.email} bios={data.skills} details={data.details} hourlyrate={data.hourlyrate}/></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}><Typography  variant="h5"><b>Experience Update Section:</b></Typography></Grid>
-        <Grid item xs={12}><ExperienceSection/></Grid>
+        <Grid item xs={12}><ExperienceSection exper={data.experience}/></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}><Typography  variant="h5"><b>Education Update Section:</b></Typography></Grid>
-        <Grid item xs={12}><EducationSection/></Grid>
+        <Grid item xs={12}><EducationSection educat={data.education}/></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>

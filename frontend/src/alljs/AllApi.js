@@ -62,10 +62,13 @@ exports.signupuser=async(name,email,pass,userType)=>{
         let res=await fetch(hostname+'/api/profile?id='+link);
         let data=await res.json()
         if(data.status=='OK'){
-            console.log(data);
+            return data.data;
         }else{
+
             alert(data.status);
+            return undefined;
         }
+
     }
     exports.updateprofiledetails=async(updatedata)=>{
         let res=await fetch(hostname+'/api/updateprofile',{
