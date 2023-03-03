@@ -1,7 +1,7 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemText, Rating, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
-import {getprojectdetails} from './AllApi'
+import {bidrequest, getprojectdetails} from './AllApi'
 
 
 export default function Main(){
@@ -12,6 +12,7 @@ export default function Main(){
    if(!pid)document.location='/'
   if(!project){
     getprojectdetails(pid).then(da=>{
+      
       setProject(da);
     });
     return <div></div>
@@ -26,7 +27,7 @@ export default function Main(){
 
   return (
     <div>
-      <PopupDialog open={open} onClose={()=>setOpen(false)}/>
+      <PopupDialog open={open} onClose={()=>setOpen(false)} projectid={pid}/>
       <Typography variant="h2">{project.title}</Typography>
       <Typography variant="subtitle1">Price Range: {project.pricerange}</Typography>
       <Typography variant="body1">Details: {project.details}</Typography>
@@ -35,11 +36,11 @@ export default function Main(){
       {localStorage.getItem('userType') === "worker" && (
         <Button variant="contained" color="primary" onClick={handleBid}>Bid</Button>
       )}
-      {project?.bids?.length > 0 && (
+      {project?.biders?.length > 0 && (
         <div>
           <Typography variant="h3">Bidders:</Typography>
           <List>
-            {project?.bids?.map((bidder) => (
+            {project?.biders?.map((bidder) => (
               <ListItem key={bidder.id}>
                 <ListItemText primary={`Name: ${bidder.name}`} secondary={`Money Required: ${bidder.money}`} />
                 <ListItemText primary={`Time Required: ${bidder.time}`} secondary={`Bio: ${bidder.bio}`} />
@@ -56,7 +57,7 @@ export default function Main(){
 
 
 
-const PopupDialog = ({ open, onClose }) => {
+const PopupDialog = ({ open, onClose ,projectid}) => {
   const [money, setMoney] = useState('');
   const [time, setTime] = useState('');
   const [details, setDetails] = useState('');
@@ -81,10 +82,9 @@ const PopupDialog = ({ open, onClose }) => {
   };
 
   const handleSubmit = () => {
-    // handle form submission here
-    console.log('Required money:', money);
-    console.log('Required time:', time);
-    console.log('Sort details:', details);
+    
+    
+    bidrequest(money,time,details,projectid);
     handleClose();
   };
 

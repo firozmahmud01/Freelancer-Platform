@@ -18,7 +18,11 @@ export default function Main(){
   
   if(!data){
     getprofiledetails(profile).then(da=>{
-      
+      if(!da?.education){
+        alert('Please comple your profile!');
+        document.location='/settings'
+        return ;
+      }
       setData(da);
     })
     return <div></div>

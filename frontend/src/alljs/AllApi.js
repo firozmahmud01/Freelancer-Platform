@@ -103,6 +103,16 @@ exports.signupuser=async(name,email,pass,userType)=>{
     }
 
     exports.getprojectdetails=async(projectid)=>{
+        let res=await fetch(hostname+'/api/projectdetails',{ method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({'pid':projectid,'cookie':localStorage.getItem('cookie')})
+      })
+      let data=await res.json();
+      if(data.status=='OK'){
+        return data.data;
+      }else{
+        alert(data.status);
+      }
 
     }
 
@@ -127,13 +137,24 @@ exports.signupuser=async(name,email,pass,userType)=>{
 
     }
 
-    exports.bidrequest=async(name,userid,amount,timelength,message)=>{
+    exports.bidrequest=async(price,time,details,projectuid)=>{
+        let res=await fetch(hostname+'/api/bidrequest',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({price,time,details,'cookie':localStorage.getItem('cookie'),projectuid}),
+        })
+        let da=await res.json();
+        if(da.status=='OK'){
+            alert("Your bid request is successfully submitted!")
+            document.location='/'
+        }else{
+            alert(da.status);
+        }
+
 
     }
 
 
-    exports.bidlist=async(projectid)=>{
-
-    }
+   
 
     

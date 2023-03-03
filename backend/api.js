@@ -1,5 +1,5 @@
 const express=require('express');
-const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails } = require('./database');
+const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails, requestbit } = require('./database');
 const r=express.Router()
 module.exports= r;
 
@@ -95,20 +95,33 @@ r.get('/projectlist',async(req,res)=>{
 })
     
 
-r.get('/projectdetails',async(req,res)=>{
+r.post('/projectdetails',async(req,res)=>{
     let {pid,cookie}=req.body;
     if(!pid||!cookie){
         res.json({status:'Failed to load for missing'})
         return ;
     }
     let data=await getProjectDetails(pid,cookie);
-    if(!data){
+    if(data){
         res.json({status:'OK',data})
     }else{
-
+        res.json({status:'Failed to load details'});
     }
 })
    
 
     
-    
+    r.post('/bidrequest',async(req,res)=>{
+        const {price,time,details,cookie,projectuid}=req.body;
+        if(!price||!time||!details||!cookie||!projectuid){
+            res.json({status:'Failed to request'})
+            return ;
+        }
+
+        let data=await requestbit(price,time,details,projectuid,cookie);
+        if(data){
+            res.json({status:'OK'});
+        }else{
+            res.json({status:'Failed to add your bid!'});
+        }
+    })

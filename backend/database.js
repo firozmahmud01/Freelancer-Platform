@@ -261,11 +261,25 @@ if(user.length<=0)return;
   let data= await getData('SELECT * FROM projects WHERE uid=?',[pid]);
 
   if(data.length<=0)return ;
-  
+  let res={...data[0]}
   if(data[0].publisheruid==user[0].uid){
-
+    if(data[0].worker){
+      res.message=await getData('SELECT * FROM messages WHERE projectid=?',[data[0].uid])
+    }else{
+      res.biders=await getData('SELECT * FROM bidlist WHERE projectid=?',[data[0].uid])
+    }
   }
-
-    return {...data[0],};
+if(user[0].profile==data[0].worker){
+  res.message=await getData('SELECT * FROM messages WHERE projectid=?',[data[0].uid])
+}
+    return res;
   
+}
+
+exports.requestbit=async(price,time,details,projectid,cookie)=>{
+  // bidlist(uid ,price ,time ,details ,profile ,img ,biddername ,projectid
+  let user=await getData('SELECT * FROM normaluser WHERE token=?',[cookie]);
+  if(user.length<=0)return;
+  await getData('INSERT INTO bidlist(price,time,details,projectid,profile,img,biddername) VALUES(?,?,?,?,?,?,?)',[price,time,details,projectid,user[0].profile,user[0].img,user[0].name])
+  return 'OK';
 }
