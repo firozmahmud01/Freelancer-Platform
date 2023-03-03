@@ -1,7 +1,7 @@
 import { AccountBox, AddBox, AddCircleOutline, Delete, LibraryAdd } from "@mui/icons-material";
-import { Button, Card, CardMedia, Grid, IconButton, Paper, TextField, Typography } from "@mui/material";
+import { Button, Card, CardMedia, Dialog, DialogContent, DialogTitle, Grid, IconButton, Paper, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import { getprofiledetails } from "./AllApi";
+import { getprofiledetails, hostname, updateprofiledetails } from "./AllApi";
 
 
 
@@ -20,9 +20,11 @@ function imgToBase(url){
 
 
 function ProfilePictureSection({img}){
-    const [image,setImage]=useState(img);
+    const [image,setImage]=useState(hostname+'/images/'+img);
     
-    
+    const handleSaveImage=async()=>{
+        await updateprofiledetails({img:image})
+    }
 
     return (<Grid container >
         <Grid item xs={12}>
@@ -38,9 +40,9 @@ function ProfilePictureSection({img}){
             <Button color="secondary" variant={"contained"} component="label" sx={{marginLeft:'16px',marginTop:'100%'}}>
                 Choose
                 <input hidden onChange={(e)=>{
-                    imgToBase(e.target.files[0]).then(basedata=>[
+                    imgToBase(e.target.files[0]).then(basedata=>{
                         setImage(basedata)
-                    ])
+                })
                 }} accept="image/*" type="file" />
                 </Button>
         </Grid>
@@ -50,7 +52,7 @@ function ProfilePictureSection({img}){
                 if(img==image){
                     return ;
                 }
-
+                handleSaveImage();
 
             }} variant={"contained"}>Save</Button>
         </Grid>
@@ -61,60 +63,103 @@ function ProfilePictureSection({img}){
 
 
 function PortfolioSection({images}){
-    let all=images?.map((item,index)=>{
+  const [open,setOpen]=useState(false);
+  const [image,setImage]=useState()
+  
+    let all=images?.split(
+      ','
+    )?.map((item,index)=>{
         return (<Grid xs={3} item keys={index}>
           <Card sx={{maxWidth:'200px'}}>
-            <CardMedia sx={{height:'200px'}} image={item}></CardMedia>
+            <CardMedia sx={{height:'200px'}} image={hostname+'/images/'+item}></CardMedia>
           </Card>
         </Grid>)
       })
-    return <Paper elevation={10} sx={{marginTop:'32px', padding:'8px',width:'94%'}}>
+    return (<div>
+      <input hidden id="imagechooser" onChange={(e)=>{
+                    imgToBase(e.target.files[0]).then(basedata=>{
+                        setImage(basedata);
+                        setOpen(true);
+      })
+                }} accept="image/*" type="file"/>
+                <UploadCardDialog open={open} setOpen={setOpen} image={image}/>
+    <Paper elevation={10} sx={{marginTop:'64px',marginLeft:'12%', padding:'32px',width:'75%'}}>
     <Typography variant="h5"><b>All Portfolio Pictures:</b></Typography>
-    <Grid container spacing={3}>
+    
+                
+    <Grid container sx={{marginTop:'32px'}} spacing={2}>
         {all}
         <Grid xs={3} item>
-            <IconButton >
+            <IconButton onClick={e=>document.getElementById('imagechooser').click()}>
             <AddBox color="secondary" sx={{height:'150px',width:'150px'}}></AddBox>
             </IconButton>
         </Grid>
     </Grid>
     </Paper>
+    </div>)
 }
 
 function PictureSection({img,portfolio}){
 return <div>
-    <ProfilePictureSection/>
+    <ProfilePictureSection img={img}/>
     
-    <PortfolioSection/>
+    <PortfolioSection images={portfolio}/>
     
 </div>
 }
 
-function ProfileSection({names,emails,bios,details,hourlyrate}){
-      const [name, setName] = useState('');
-      const [email, setEmail] = useState('');
+
+
+
+const UploadCardDialog = ({ open,setOpen,image}) => {
+  
+
+  const handleUpload = () => {
+    updateprofiledetails({portfolio:image})
+  };
+
+  
+  return (
+    <Dialog open={open} onClose={e=>{
+      setOpen(false)
+    }}>
+      <DialogTitle>Upload Image</DialogTitle>
+      <DialogContent>
+        <img
+            src={image}
+            title="Portfolio Image"
+          />
+        
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleUpload}
+        >
+          Upload
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+
+
+function ProfileSection({names,emails,bios,details,hourlyrate,addres}){
+      const [name, setName] = useState(names||'');
+      const [email, setEmail] = useState(emails||'');
       const [password, setPassword] = useState('');
-      const [bio, setBio] = useState('');
-      const [address, setAddress] = useState('');
-      const [hourlyRate, setHourlyRate] = useState('');
+      const [bio, setBio] = useState(bios||'');
+      const [detail,setDetails]=useState(details||'')
+      const [address, setAddress] = useState(addres||'');
+      const [hourlyRate, setHourlyRate] = useState(hourlyrate||'');
     
       const handleSubmit = async (event) => {
         event.preventDefault();
-        const response = await fetch('/api/updateprofile', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            password,
-            bio,
-            address,
-            hourlyRate,
-          }),
-        });
-        // handle the response as necessary
+        await updateprofiledetails({
+          name,email,pass:password,'details':detail,'skills':bio,address,'hourlyrate':hourlyRate
+        })
+
+
       };
     
       return (
@@ -123,6 +168,14 @@ function ProfileSection({names,emails,bios,details,hourlyrate}){
             label="Name"
             value={name}
             onChange={(event) => setName(event.target.value)}
+            required
+          />
+          <TextField
+            label="About Your self"
+            value={detail}
+            multiline
+            elevation={3}
+            onChange={(event) => setDetails(event.target.value)}
             required
           />
           <TextField
@@ -140,8 +193,9 @@ function ProfileSection({names,emails,bios,details,hourlyrate}){
             required
           />
           <TextField
-            label="Bio"
+            label="Skills(Comma Separated!)"
             multiline
+            required
             rows={4}
             value={bio}
             onChange={(event) => setBio(event.target.value)}
@@ -149,6 +203,7 @@ function ProfileSection({names,emails,bios,details,hourlyrate}){
           <TextField
             label="Address"
             multiline
+            required
             rows={4}
             value={address}
             onChange={(event) => setAddress(event.target.value)}
@@ -156,6 +211,7 @@ function ProfileSection({names,emails,bios,details,hourlyrate}){
           <TextField
             label="Hourly Rate"
             type="number"
+            required
             value={hourlyRate}
             onChange={(event) => setHourlyRate(event.target.value)}
           />
@@ -167,8 +223,12 @@ function ProfileSection({names,emails,bios,details,hourlyrate}){
         
 }
 function EducationSection({educat}){
+      let data;
+      if(educat){
+        data=JSON.parse(educat);
+      }
     
-      const [education, setEducation] = useState([
+      const [education, setEducation] = useState(data||[
         { programName: '', schoolName: '', startYear: '', startMonth: '', endYear: '', endMonth: '', result: '' },
       ]);
     
@@ -187,14 +247,7 @@ function EducationSection({educat}){
     
       const handleSubmit = async (event) => {
         event.preventDefault();
-        const response = await fetch('/api/updateeducation', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ education }),
-        });
-        // handle the response as necessary
+        await updateprofiledetails({'education':JSON.stringify(education)})
       };
     
       return (
@@ -310,8 +363,11 @@ function EducationSection({educat}){
 
 
 function ExperienceSection({exper}){
-   
-      const [experiences, setExperiences] = useState([
+      let data;
+      if(exper){
+        data=JSON.parse(exper);
+      }
+      const [experiences, setExperiences] = useState(data||[
         { title: '', startYear: '', startMonth: '', endYear: '', endMonth: '', details: '' },
       ]);
     
@@ -327,14 +383,7 @@ function ExperienceSection({exper}){
     
       const handleSubmit = async (event) => {
         event.preventDefault();
-        const response = await fetch('/api/updateexperience', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ experiences }),
-        });
-        // handle the response as necessary
+        await updateprofiledetails({'experience':JSON.stringify(experiences)})
       };
     
       return (
@@ -410,6 +459,7 @@ function ExperienceSection({exper}){
               <TextField
                 label="Details"
                 multiline
+                required
                 rows={4}
                 value={experience.details}
                 onChange={(event) =>
@@ -439,7 +489,8 @@ function ExperienceSection({exper}){
 export default function Main(){
     const [data,setData]=useState()
     if(!data){
-      getprofiledetails().then(da=>{
+      getprofiledetails(localStorage.getItem('profile')).then(da=>{
+        
         setData(da);
       })
       return <div></div>
@@ -452,7 +503,7 @@ export default function Main(){
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}><Typography variant="h5"><b>Profile Update Section:</b></Typography></Grid>
-        <Grid item xs={12}><ProfileSection names={data.name} emails={data.email} bios={data.skills} details={data.details} hourlyrate={data.hourlyrate}/></Grid>
+        <Grid item xs={12}><ProfileSection names={data.name} emails={data.email} bios={data.skills} details={data.details} hourlyrate={data.hourlyrate} addres={data.address}/></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>
         <Grid item xs={12}></Grid>

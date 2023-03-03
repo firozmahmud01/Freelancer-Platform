@@ -1,6 +1,6 @@
 import { Avatar, Card, CardMedia, Grid, Paper, Typography } from "@mui/material";
 import { useState } from "react"
-import { getprofiledetails } from "./AllApi"
+import { getprofiledetails, hostname } from "./AllApi"
 import ProfileBackPic from '../image/profileback.jpg'
 import { Box, Container } from "@mui/system";
 async function loadProfiledetails(setData,profile){
@@ -15,22 +15,24 @@ export default function Main(){
   profile=profile[profile.length-1]
   if(profile=='profile')document.location='/'
   const [data,setData]=useState(undefined);
-  // if(!data){
-  //   loadProfiledetails(setData,profile);
-  //   return <div></div>
-  // }
+  if(!data){
+    getprofiledetails(profile).then(da=>{
+      console.log(da)
+      setData(da);
+    })
+    return <div></div>
+  }
   return <div>
     <Card sx={{width:'100%'}}>
       <CardMedia sx={{height:'350px'}} image={ProfileBackPic}></CardMedia>
     </Card>
     <div style={{width:'60%',marginLeft:'20%',backgroundColor:'white',padding:'32px',height:'200px',position:'absolute',top:'210px'}}>
-    <ProfileUpper img={'https://bauet.ac.bd/wp-content/uploads/2020/11/BAUET-Logo-250x244-1.png'} name={localStorage.getItem('name')} jobtitle={"Graphics Designer"} address={"BAUET, Nator"} details={"A graphic designer is a professional within the graphic design and graphic arts industry who assembles together images, typography, or motion graphics to create a piece of design. A graphic designer creates the graphics primarily for published, printed, or electronic media, such as brochures and advertising."} hourlyrate={'100৳/hour'}/>
+    <ProfileUpper img={data?.img} name={data?.name} jobtitle={data?.skills} address={data?.address} details={data?.details} hourlyrate={data?.hourlyrate}/>
       
     <Paper elevation={3} sx={{padding:'16px',margin:'32px'}}>
         <Typography variant="h6"><b>Portfolio Items</b></Typography>
         <div style={{margin:'32px'}}>
-          <Portfolio imgs={[ProfileBackPic,ProfileBackPic,ProfileBackPic,ProfileBackPic,
-          ProfileBackPic,ProfileBackPic,ProfileBackPic,ProfileBackPic]}/>
+          <Portfolio imgs={data?.portfolio?.split(',')}/>
         </div>
       </Paper>
       
@@ -45,7 +47,7 @@ export default function Main(){
             </Paper>
             <br></br>
             <Paper elevation={3} sx={{padding:'8px'}}>
-            <ExperienceList/>
+            <ExperienceList exp={JSON.parse(data?.experience||'[]')}/>
             </Paper>
             <br></br>
           <br></br>
@@ -54,7 +56,17 @@ export default function Main(){
             </Paper>
             <br></br>
             <Paper elevation={3} sx={{padding:'8px'}}>
-            <ExperienceItem title="BSC in CSE" time="Bangladesh Army University of Engineering and Technology" details="Jan 2019-Jun 2023"/>
+              {(()=>{
+                let edu=JSON.parse(data?.education||'[]')
+                let retu=[]
+                for (let e of edu){
+                  retu.push(<div keys={e.title}><ExperienceItem title={e.programName} time={e.schoolName} details={e.startMonth+'/'+e.startYear+'-'+e.endMonth+"/"+e.endYear}/><br></br></div>)
+                }
+
+                return retu;
+
+              })()}
+            
             </Paper>
             <br></br>
             <br></br>
@@ -64,9 +76,12 @@ export default function Main(){
   </div>
 }
 
-function ExperienceList(){
-  let data=[{title:'Graphics Designer',time:'Jan 2018-Dec 2020',details:'I was working with a farm called \'Motion Graphic\' as a Graphics Designer'}]
-  return <ExperienceItem title={data[0].title} time={data[0].time} details={data[0].details}/>
+function ExperienceList({exp}){
+  let d=[]
+  for (let e of exp){
+    d.push( <div keys={e.title} ><ExperienceItem  title={e.title} time={e.startMonth+'/'+e.startYear+'-'+e.endMonth+'/'+e.endYear} details={e.details}/> <br></br></div>)
+  }
+  return d;
 }
 
 function ExperienceItem({title,time,details}){
@@ -81,7 +96,7 @@ function Portfolio({imgs}){
   let all=imgs.map((item,index)=>{
     return (<Grid xs={3} item keys={index}>
       <Card sx={{maxWidth:'200px'}}>
-        <CardMedia sx={{height:'200px'}} image={item}></CardMedia>
+        <CardMedia sx={{height:'200px'}} image={hostname+'/images/'+item}></CardMedia>
       </Card>
     </Grid>)
   })
@@ -122,10 +137,10 @@ function ProfileUpper({img,name,jobtitle,address,details,hourlyrate}){
     <Grid container spacing={3}>
       <Grid item xs={2}>
         <Card sx={{maxWidth:'150px'}}>
-          <CardMedia sx={{height:'150px'}} image={img}></CardMedia>
+          <CardMedia sx={{height:'150px'}} image={hostname+'/images/'+img}></CardMedia>
         </Card>
         <br></br>
-        <Typography variant="h6">{hourlyrate}</Typography>
+        <Typography variant="h6">{hourlyrate+'$/Hour'}</Typography>
         <Typography variant="h6">{address}</Typography>
       </Grid>
 

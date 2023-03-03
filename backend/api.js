@@ -1,5 +1,5 @@
 const express=require('express');
-const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture } = require('./database');
+const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile } = require('./database');
 const r=express.Router()
 module.exports= r;
 
@@ -48,15 +48,15 @@ r.post('/signup',async(req,res)=>{
 
 
    
-r.post('/updateprofilepic',async(req,res)=>{
+r.post('/updateprofile',async(req,res)=>{
 
-    const {cookie,image}=req.body;
-    if(!cookie||!image){
+    const {cookie,data}=req.body;
+    if(!cookie||!data){
         res.json({status:'Failed to load image!'});
         return;
     }
-    let data=await updateProfilePicture(image,cookie);
-    if(data){
+    let da=await updateProfile(data,cookie);
+    if(da){
         res.json({status:'OK'})
     }else{
         res.json({status:'Failed to upload profile picture!'})
@@ -68,13 +68,13 @@ r.post('/updateprofilepic',async(req,res)=>{
 
     
 r.post('/uploadproject',async (req,res)=>{
-    let {title,requirements,details,attachments,pricerange}=req.body;
-    if(!title||!requirements||!details||!attachments||!pricerange){
+    let {title,details,requirements,pricerange,attachments,cookie}=req.body;
+    if(!title||!requirements||!details||!attachments||!pricerange||!cookie){
         res.json({status:'Failed to work with you'});
         return ;
     
     }
-
+    
 
     
 })

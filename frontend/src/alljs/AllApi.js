@@ -2,8 +2,9 @@ const { productitem, productdetails, reviewitem, babysitteritem, babysitterdetai
 
 const fakeimage='http://admission.bauet.ac.bd/img/logo.png'
 
+let hostname='http://localhost:4000'
+exports.hostname=hostname;
 
-const hostname='http://localhost:4000'
 
 exports.getSearchResult=(query,skills)=>{
 
@@ -74,20 +75,21 @@ exports.signupuser=async(name,email,pass,userType)=>{
         let res=await fetch(hostname+'/api/updateprofile',{
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedata),
+            body: JSON.stringify({data:updatedata,cookie:localStorage.getItem('cookie')}),
         })
         let data=await res.json();
         if(data.status=='OK'){
+            alert("Updated successfully!")
             document.location.reload();
+        }else{
+            alert(data.status);
         }
     }
     exports.withdrawrequest=async(amount,number)=>{
         
     }
 
-    exports.uploadProfilePicture=async(pic)=>{
-        
-    }
+    
 
     exports.cashinrequest=async(amount,number,refarencenumber)=>{
 
@@ -96,7 +98,12 @@ exports.signupuser=async(name,email,pass,userType)=>{
     exports.getprojectdetails=async()=>{
 
     }
-    exports.uploadproject=async(title,requirements,details,amountrange,attachments)=>{
+    exports.uploadproject=async(title,requirements,details,pricerange,attachments)=>{
+        let res=await fetch (hostname+'/api/uploadproject',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({title,details,requirements,pricerange,attachments,cookie:localStorage.getItem('cookie')}),
+        })
         
     }
     exports.previousmessageinbox=async()=>{

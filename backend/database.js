@@ -18,11 +18,11 @@ let con = mysql.createConnection({
       }
       con.query("USE Freelancer");
     
-    con.query("CREATE TABLE IF NOT EXISTS normaluser(uid INTEGER PRIMARY KEY AUTO_INCREMENT,name TEXT,email TEXT,pass TEXT,token TEXT,userType TEXT,balance INTEGER DEFAULT 0,img TEXT,profile TEXT DEFAULT 0,details TEXT,jobtitle TEXT,portfolio TEXT,experience TEXT,education TEXT);")
+    con.query("CREATE TABLE IF NOT EXISTS normaluser(uid INTEGER PRIMARY KEY AUTO_INCREMENT,name TEXT,email TEXT,pass TEXT,token TEXT,userType TEXT,balance INTEGER DEFAULT 0,img TEXT,profile TEXT DEFAULT 0,details TEXT,skills TEXT,portfolio TEXT,experience TEXT,education TEXT,address TEXT,hourlyrate TEXT);")
 
 
                                                             // title,requirements,details,attachments,pricerange
-    con.query("CREATE TABLE IF NOT EXISTS projects(uid INTEGER PRIMARY KEY AUTO_INCREMENT,title TEXT,requirements TEXT,details TEXT,attachments TEXT,pricerange TEXT);")
+    con.query("CREATE TABLE IF NOT EXISTS projects(uid INTEGER PRIMARY KEY AUTO_INCREMENT,title TEXT,requirements TEXT,details TEXT,attachments TEXT,pricerange TEXT,publishername TEXT,publisheruid TEXT);")
     
     
     
@@ -47,12 +47,82 @@ async function getData(cmd,arg){
   return p;
   
 }
-exports.updateProfilePicture=async(pic,token)=>{
+
+exports.updateProfile=async (data,cookie)=>{
+  let keys=Object.keys(data);
+  if(keys.indexOf('img')>=0){
+    await updateProfilePicture(data['img'],cookie);
+    delete data['img'];
+    keys=Object.keys(data);
+    if(keys.length<=0){
+      return "OK";
+    }
+  }
+
+  if(keys.indexOf('portfolio')>=0){
+    let list=await getData('SELECT uid,portfolio FROM normaluser WHERE token=?',[cookie]);
+    if(list.length>0){
+      let port=list[0].portfolio
+      let folio=''
+      if(port){
+        folio=port+',';
+      }
+      let img=await saveimage(data['portfolio']);
+      folio+=img;
+      await getData('UPDATE normaluser SET portfolio=? WHERE uid=?',[folio,list[0].uid])
+      delete data.portfolio;
+      keys=Object.keys(data);
+      if(keys.length<=0){
+        return "OK"
+      }
+    }
+  }
+
+
+
+
+
+    if(keys.indexOf('pass')>=0){
+      let upass=crypto.createHash('sha256').update(data.pass).digest('base64');
+        await getData('UPDATE normaluser SET pass=? WHERE token=?',[upass,cookie])
+        delete data.pass;
+        keys=Object.keys(data);
+        if(keys.length<=0){
+          return "OK"
+        }
+      }
+
+
+
+
+
+let cmd='UPDATE normaluser SET';
+let arg=[];
+    for (let key of keys){
+      cmd+=' '+namespaceremover(key)+'=?,'
+      
+      arg.push(data[key]);
+    }
+    cmd=cmd.substring(0,cmd.length-1);
+    if(keys.length>0){
+      cmd+=' WHERE token=?'
+      await getData(cmd,[...arg,cookie])
+      return "OK"
+    }
+
+
+}
+
+
+
+
+
+async function updateProfilePicture(pic,token){
   let name=await getData('SELECT img FROM normaluser WHERE token=?;',[token]);
   if(name.length<=0){
     return ;
   }else{
-    await saveimage(pic,name[0].img);
+    await saveimagewithname(pic,name[0].img);
     return 'OK';
   }
 }
@@ -68,6 +138,10 @@ exports.checktoken=async(token)=>{
     return undefined;
   }
 }
+
+
+
+
 function namespaceremover(name){
   
   let res='';
@@ -75,6 +149,8 @@ function namespaceremover(name){
     if((name[i]>='a'&&name[i]<='z')||(name[i]>='A'&&name[i]<='Z'))res+=name[i];}
   return res.toLowerCase();
 }
+
+
 exports.createUser=async(name,email,pass,userType)=>{
   let upass=crypto.createHash('sha256').update(pass).digest('base64');
   const cmd="SELECT uid FROM normaluser WHERE email=?;"
@@ -86,14 +162,15 @@ exports.createUser=async(name,email,pass,userType)=>{
     await getData("INSERT INTO normaluser (name, email, pass, userType) VALUES (?,?,?,?);",[name,email,upass,userType])
     let da=await getData('SELECT uid FROM normaluser WHERE email=?',[email]);
 
-    await getData('UPDATE normaluser SET profile=? ,img=?',[namespaceremover(name)+''+da[0].uid,namespaceremover(name)+''+da[0].uid+'.jpg'])
+    await getData('UPDATE normaluser SET profile=? ,img=? WHERE uid=?',[namespaceremover(name)+''+da[0].uid,namespaceremover(name)+''+da[0].uid+'.jpg',da[0].uid])
     return "OK"
   }
 
 }
 exports.getProfileDetails=async(link)=>{
-  let data=await getData('SELECT uid,name,email,userType,img,profile FROM normaluser WHERE profile=?',[link]);
+  let data=await getData('SELECT * FROM normaluser WHERE profile=?',[link]);
   if(data.length>0){
+    delete data[0].pass
     return data[0];
   }
 }
@@ -189,7 +266,7 @@ async function saveimage(img){
 
 
 
-async function saveimage(img,name){
+async function saveimagewithname(img,name){
   let base64Data = img.replace(/^data:image\/\w+;base64,/, "");
   return await new Promise((res,erro)=>{
     fs.writeFile('images/'+name, base64Data, 'base64', function(err) {
