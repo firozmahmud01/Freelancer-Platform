@@ -19,8 +19,9 @@ let con = mysql.createConnection({
       con.query("USE Freelancer");
     
     con.query("CREATE TABLE IF NOT EXISTS normaluser(uid INTEGER PRIMARY KEY AUTO_INCREMENT,name TEXT,email TEXT,pass TEXT,token TEXT,userType TEXT,balance INTEGER DEFAULT 0,img TEXT,profile TEXT DEFAULT 0,details TEXT,skills TEXT,portfolio TEXT,experience TEXT,education TEXT,address TEXT,hourlyrate TEXT);")
-    con.query("CREATE TABLE IF NOT EXISTS projects(uid INTEGER PRIMARY KEY AUTO_INCREMENT,title TEXT,requirements TEXT,details TEXT,attachments TEXT,pricerange TEXT,publishername TEXT,publisheruid TEXT);")
-    
+    con.query("CREATE TABLE IF NOT EXISTS projects(uid INTEGER PRIMARY KEY AUTO_INCREMENT,title TEXT,requirements TEXT,details TEXT,attachments TEXT,pricerange TEXT,publishername TEXT,publisheruid TEXT,worker TEXT);")
+    con.query("CREATE TABLE IF NOT EXISTS bidlist(uid INTEGER PRIMARY KEY AUTO_INCREMENT,price TEXT,time TEXT,details TEXT,profile TEXT,img TEXT,biddername TEXT,projectid TEXT);")
+    con.query("CREATE TABLE IF NOT EXISTS messages(uid INTEGER PRIMARY KEY AUTO_INCREMENT,msg TEXT,time TEXT,sender TEXT,receiver TEXT,projectid TEXT);")
     
     
   });
@@ -240,7 +241,7 @@ return 'OK';
 
 
 exports.getProjectlist=async(query)=>{
-  let cmd='SELECT uid,title,publishername,details,requirements FROM projects'+(query?' title LIKE ? OR details LIKE ? OR skills LIKE ?':'')
+  let cmd='SELECT uid,title,publishername,details,requirements FROM projects WHERE worker IS NULL'+(query?' AND (title LIKE ? OR details LIKE ? OR skills LIKE ?)':'')
   let prm=[]
   if(query){
     prm.push('%'+query+"%")
@@ -251,4 +252,20 @@ exports.getProjectlist=async(query)=>{
   return da;
 
 
+}
+
+
+exports.getProjectDetails=async(pid,token)=>{
+  let user=await getData('SELECT * FROM normaluser WHERE token=?',[token])
+if(user.length<=0)return;
+  let data= await getData('SELECT * FROM projects WHERE uid=?',[pid]);
+
+  if(data.length<=0)return ;
+  
+  if(data[0].publisheruid==user[0].uid){
+
+  }
+
+    return {...data[0],};
+  
 }

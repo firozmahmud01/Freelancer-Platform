@@ -1,5 +1,5 @@
 const express=require('express');
-const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist } = require('./database');
+const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails } = require('./database');
 const r=express.Router()
 module.exports= r;
 
@@ -95,7 +95,19 @@ r.get('/projectlist',async(req,res)=>{
 })
     
 
+r.get('/projectdetails',async(req,res)=>{
+    let {pid,cookie}=req.body;
+    if(!pid||!cookie){
+        res.json({status:'Failed to load for missing'})
+        return ;
+    }
+    let data=await getProjectDetails(pid,cookie);
+    if(!data){
+        res.json({status:'OK',data})
+    }else{
 
+    }
+})
    
 
     
