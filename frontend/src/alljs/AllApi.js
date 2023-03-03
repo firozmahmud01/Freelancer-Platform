@@ -6,9 +6,7 @@ let hostname='http://localhost:4000'
 exports.hostname=hostname;
 
 
-exports.getSearchResult=(query,skills)=>{
 
-}
 
 
 
@@ -53,12 +51,17 @@ exports.signupuser=async(name,email,pass,userType)=>{
 
 }
 
-    exports.projectlist=async()=>{
-
+    exports.getprojectlist=async(query)=>{
+        let res=await fetch(hostname+'/api/projectlist'+(query?'?query='+query:''))
+        let da=await res.json();
+        if(da.status=='OK'){
+            return da.data;
+        }else{
+            alert(da.status);
+        }
     }
-    exports.currentprojects=async()=>{
 
-    }
+
     exports.getprofiledetails=async(link)=>{
         let res=await fetch(hostname+'/api/profile?id='+link);
         let data=await res.json()
@@ -71,6 +74,8 @@ exports.signupuser=async(name,email,pass,userType)=>{
         }
 
     }
+
+
     exports.updateprofiledetails=async(updatedata)=>{
         let res=await fetch(hostname+'/api/updateprofile',{
             method: 'POST',
@@ -85,6 +90,8 @@ exports.signupuser=async(name,email,pass,userType)=>{
             alert(data.status);
         }
     }
+
+
     exports.withdrawrequest=async(amount,number)=>{
         
     }
@@ -95,17 +102,27 @@ exports.signupuser=async(name,email,pass,userType)=>{
 
     }
 
-    exports.getprojectdetails=async()=>{
+    exports.getprojectdetails=async(projectid)=>{
 
     }
+
+
     exports.uploadproject=async(title,requirements,details,pricerange,attachments)=>{
         let res=await fetch (hostname+'/api/uploadproject',{
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({title,details,requirements,pricerange,attachments,cookie:localStorage.getItem('cookie')}),
         })
-        
+        let data=await res.json();
+        if(data.status=='OK'){
+            alert('Your project is successfully uploaded!');
+            document.location.reload();
+        }else{
+            alert(data.status);
+        }
     }
+
+
     exports.previousmessageinbox=async()=>{
 
     }
@@ -113,10 +130,10 @@ exports.signupuser=async(name,email,pass,userType)=>{
     exports.bidrequest=async(name,userid,amount,timelength,message)=>{
 
     }
+
+
     exports.bidlist=async(projectid)=>{
 
     }
 
-    exports.searchproject=async(keyword)=>{
-
-    }
+    

@@ -15,9 +15,10 @@ export default function Main(){
   profile=profile[profile.length-1]
   if(profile=='profile')document.location='/'
   const [data,setData]=useState(undefined);
+  
   if(!data){
     getprofiledetails(profile).then(da=>{
-      console.log(da)
+      
       setData(da);
     })
     return <div></div>

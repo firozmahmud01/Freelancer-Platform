@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, CardHeader, CardMedia, Dialog, DialogActions, DialogContent, DialogTitle, Fab, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { uploadproject } from "./AllApi";
+import { getprofiledetails, getprojectdetails, getprojectlist, uploadproject } from "./AllApi";
 
 
 
@@ -79,19 +79,25 @@ const AddProjectButton = () => {
 
 export default function Main(){
     
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState();
   const [searchTerm, setSearchTerm] = useState('');
+  const searchParams = new URLSearchParams(window.location.search);
+    const q = searchParams.get("q")||undefined;
+  if(!projects){
 
-  useEffect(() => {
-    
-  }, []);
+    getprojectlist(q).then(da=>{
+      
+      setProjects(da);
+    })
+    return <div></div>
+  }
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
   const filteredProjects = projects.filter((project) =>
-    project.title.toLowerCase().includes(searchTerm.toLowerCase())
+    project?.title?.toLowerCase().includes(searchTerm.toLowerCase())||project?.details?.toLowerCase().includes(searchTerm.toLowerCase())||project?.requirements?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -105,17 +111,17 @@ export default function Main(){
         margin="normal"
       />
       {filteredProjects.map((project) => (
-        <Card key={project.id}>
+        <Card key={project.uid}>
           <CardHeader
             title={project.title}
-            subheader={`Published by ${project.publisher}`}
+            subheader={`Published by ${project.publishername}`}
           />
           <CardContent>
-            <Typography variant="body1">{project.shortDetails}</Typography>
+            <Typography variant="body1">{project.details.substring(0,project.details.length>20?20:project.details.length)+'...'}</Typography>
             <Button
               variant="contained"
               color="primary"
-              href={`/projects/${project.id}`}
+              href={`/project?id=${project.uid}`}
             >
               Details
             </Button>

@@ -1,27 +1,45 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemText, Rating, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
-export default function Main({ project, userType, isProjectOwner, isBidSubmitted, bidders, onBid }){
-   
+import {getprojectdetails} from './AllApi'
+
+
+export default function Main(){
+   const [project,setProject]=useState()
+   const [open,setOpen]=useState(false);
+   const searchParams = new URLSearchParams(window.location.search);
+   const pid = searchParams.get("id")||undefined;
+   if(!pid)document.location='/'
+  if(!project){
+    getprojectdetails(pid).then(da=>{
+      setProject(da);
+    });
+    return <div></div>
+
+  }
+
+
+
   const handleBid = () => {
-    onBid(project.id);
+    setOpen(true);
   };
 
   return (
     <div>
+      <PopupDialog open={open} onClose={()=>setOpen(false)}/>
       <Typography variant="h2">{project.title}</Typography>
-      <Typography variant="subtitle1">Price Range: {project.priceRange}</Typography>
+      <Typography variant="subtitle1">Price Range: {project.pricerange}</Typography>
       <Typography variant="body1">Details: {project.details}</Typography>
-      <Typography variant="body1">Skills Required: {project.skills}</Typography>
+      <Typography variant="body1">Skills Required: {project.requirements}</Typography>
       <Typography variant="body1">Attachments: {project.attachments}</Typography>
-      {userType === "worker" && !isProjectOwner && !isBidSubmitted && (
+      {localStorage.getItem('userType') === "worker" && (
         <Button variant="contained" color="primary" onClick={handleBid}>Bid</Button>
       )}
-      {isProjectOwner && bidders.length > 0 && (
+      {project?.bids?.length > 0 && (
         <div>
           <Typography variant="h3">Bidders:</Typography>
           <List>
-            {bidders.map((bidder) => (
+            {project?.bids?.map((bidder) => (
               <ListItem key={bidder.id}>
                 <ListItemText primary={`Name: ${bidder.name}`} secondary={`Money Required: ${bidder.money}`} />
                 <ListItemText primary={`Time Required: ${bidder.time}`} secondary={`Bio: ${bidder.bio}`} />

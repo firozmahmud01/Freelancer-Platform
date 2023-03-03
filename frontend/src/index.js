@@ -181,7 +181,7 @@ function LinkChecker({setAppBar}){
     <Route path='/work/apply' element={<WorkApplication setAppBar={setAppBar}/>} >
   
     </Route>
-    <Route path='/work/details' element={<WorkDetails setAppBar={setAppBar}/>} ></Route>
+    <Route path='/project' element={<WorkDetails setAppBar={setAppBar}/>} ></Route>
     
     <Route path="*" element={<NotFound setAppBar={setAppBar}/>}/>
     </Routes>

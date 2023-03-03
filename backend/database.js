@@ -19,18 +19,9 @@ let con = mysql.createConnection({
       con.query("USE Freelancer");
     
     con.query("CREATE TABLE IF NOT EXISTS normaluser(uid INTEGER PRIMARY KEY AUTO_INCREMENT,name TEXT,email TEXT,pass TEXT,token TEXT,userType TEXT,balance INTEGER DEFAULT 0,img TEXT,profile TEXT DEFAULT 0,details TEXT,skills TEXT,portfolio TEXT,experience TEXT,education TEXT,address TEXT,hourlyrate TEXT);")
-
-
-                                                            // title,requirements,details,attachments,pricerange
     con.query("CREATE TABLE IF NOT EXISTS projects(uid INTEGER PRIMARY KEY AUTO_INCREMENT,title TEXT,requirements TEXT,details TEXT,attachments TEXT,pricerange TEXT,publishername TEXT,publisheruid TEXT);")
     
     
-    
-    // con.query("CREATE TABLE IF NOT EXISTS babyproduct(uid INTEGER PRIMARY KEY AUTO_INCREMENT,name TEXT,img TEXT,price TEXT,brand TEXT,pointmsg TEXT,details TEXT,rating INTEGER DEFAULT 0);")
-    // con.query("CREATE TABLE IF NOT EXISTS productreview(uid INTEGER PRIMARY KEY AUTO_INCREMENT,productid INTEGER,reviewername TEXT,rating TEXT,review TEXT);")
-
-    // con.query("CREATE TABLE IF NOT EXISTS babysitter(uid INTEGER PRIMARY KEY AUTO_INCREMENT,name TEXT,profilepic TEXT,phone TEXT,education TEXT,experience TEXT,details TEXT,age TEXT,gender TEXT,email TEXT,pass TEXT);")
-
     
   });
 
@@ -167,6 +158,10 @@ exports.createUser=async(name,email,pass,userType)=>{
   }
 
 }
+
+
+
+
 exports.getProfileDetails=async(link)=>{
   let data=await getData('SELECT * FROM normaluser WHERE profile=?',[link]);
   if(data.length>0){
@@ -193,61 +188,9 @@ exports.checkauth=async(user,pass)=>{
 
 
 
-exports.getfoodlist=async(start,end)=>{
-  let cmd='SELECT uid,name,img,price,brand,rating FROM babyproduct LIMIT ?, ?;';
-  let data=await getData(cmd,[Number(start),Number(end)])
-  let result=[]
-  for(let i=0;i<data.length;i++){
-    let d=data[i];
-    result.push(new productitem(d.uid,d.name,d.img,d.price,d.rating,d.brand))
-  }
-  return result;
-}
-exports.getfooddetails=async(id)=>{
-  let cmd='SELECT * FROM babyproduct WHERE uid=?;';
-  let data=await getData(cmd,[Number(id)])
-  if(data.length>0){
-    let reviews=[]
-    let rev=await getData('SELECT * FROM productreview WHERE productid=?;',[data[0].uid])
-    if(rev.length>0){
-      reviews.push(new reviewitem(rev[0].uid,rev[0].reviewername,rev[0].review,rev[0].rating))
-    }
-    return new productdetails(data[0].uid,data[0].name,data[0].img,data[0].price,data[0].rating,data[0].brand,reviews,data[0].pointmsg,data[0].details)
-  }
-}
 
 
 
-exports.getbabysitteritem=async(start,end)=>{
-  let cmd='SELECT uid,profilepic,name,age,gender,education,experience FROM babysitter LIMIT ?, ?;'
-  let data=await getData(cmd,[Number(start),Number(end)])
-  let result=[]
-  for (let i=0;i<data.length;i++){
-    let d=data[i];
-    result.push(new babysitteritem(d.uid,d.name,d.profilepic,d.education,d.experience,d.age,d.gender))
-
-  }
-
-  return result;
-
-}
-
-exports.getbabysitterdetails=async(id)=>{
-  let cmd='SELECT uid,profilepic,name,age,gender,education,experience,details FROM babysitter LIMIT ?, ?;'
-  let data=await getData(cmd,[+start,+end])
-  let result=[]
-  for (let i=0;i<data.length;i++){
-    let d=data[i];
-    result.push(new babysitterdetails(d.uid,d.name,d.profilepic,d.phone,d.education,d.experience,d.details,d.age,d.gender))
-
-  }
-
-  return result;
-}
-
-exports.getsearch=async(q,start,end)=>{
-
-}
 async function saveimage(img){
   let base64Data = img.replace(/^data:image\/\w+;base64,/, "");
   let name="image"+Date.now()+".jpg"
@@ -283,18 +226,29 @@ async function saveimagewithname(img,name){
 
 
 
+exports.uploadProjects=async (title,details,requirements,pricerange,attachments,cookie)=>{
+  let getd=await getData('SELECT name,uid FROM normaluser WHERE token=?',[cookie]);
+  if(getd.length<=0)return;
+let imgs=[];
+for(let i of attachments){
+  let name=await saveimage(i);
+  imgs.push(name);
+}
+  await getData('INSERT INTO projects(title,details,pricerange,requirements,attachments,publishername,publisheruid) VALUES(?,?,?,?,?,?,?)',[title,details,pricerange,requirements,JSON.stringify(imgs),getd[0].name,getd[0].uid])
+return 'OK';
+}
 
-exports.uploadfood=async(name,img,prize,brand,pointmsg,details)=>{
-  try{  
-  let save=await saveimage(img)
-  let cmd='INSERT INTO babyproduct(name,img,price,brand,pointmsg,details) VALUES(?,?,?,?,?,?)';
-  await getData(cmd,[name,save,prize,brand,pointmsg,details])
-    return 'OK'
-  }catch(e){
-    fs.unlink('images/'+save);
-    console.log(e)
+
+exports.getProjectlist=async(query)=>{
+  let cmd='SELECT uid,title,publishername,details,requirements FROM projects'+(query?' title LIKE ? OR details LIKE ? OR skills LIKE ?':'')
+  let prm=[]
+  if(query){
+    prm.push('%'+query+"%")
+    prm.push('%'+query+"%")
+    prm.push('%'+query+"%")
   }
-
+  let da=await getData(cmd,prm)
+  return da;
 
 
 }

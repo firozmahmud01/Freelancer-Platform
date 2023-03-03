@@ -1,5 +1,5 @@
 const express=require('express');
-const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile } = require('./database');
+const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist } = require('./database');
 const r=express.Router()
 module.exports= r;
 
@@ -74,24 +74,29 @@ r.post('/uploadproject',async (req,res)=>{
         return ;
     
     }
-    
 
+    let data=await uploadProjects(title,details,requirements,pricerange,attachments,cookie);
+    if(data){
+        res.json({status:'OK'})
+    }else{
+        res.json({status:'Failed to upload project!'})
+    }
     
 })
     
-
+r.get('/projectlist',async(req,res)=>{
+    const {query}=req.query;
+    let data=await getProjectlist(query);
+    if(data){
+        res.json({status:'OK',data})
+    }else{
+        res.json({status:'Failed to load projects!'})
+    }
+})
     
 
 
-    r.get('/search',async(req,res)=>{
-        let {q}=req.query
-        if(!q){
-            res.json({status:'Something is missing'})
-            return 
-        }
-
-        
-    })
+   
 
     
     
