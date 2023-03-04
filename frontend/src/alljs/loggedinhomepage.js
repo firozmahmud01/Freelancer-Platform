@@ -1,5 +1,5 @@
 import { Search } from "@mui/icons-material";
-import { Button, Card, CardContent, CardHeader, CardMedia, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, InputAdornment, TextField, Typography } from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, InputAdornment, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getprofiledetails, getprojectdetails, getprojectlist, uploadproject } from "./AllApi";
 
@@ -41,16 +41,29 @@ const AddProjectButton = () => {
 
   return (
     <div>
-      <Fab color="primary" aria-label="add" sx={{position:'fixed',bottom:'32px',right:'32px'}} onClick={handleClickOpen}>
-        +
+      <Fab color="primary" aria-label="add" variant="extended" sx={{color:'black',backgroundColor:'yellow',position:'fixed',bottom:'32px',right:'32px'}} onClick={handleClickOpen}>
+        + CREATE
       </Fab>
       <Dialog open={open} onClose={handleClose} aria-labelledby="add-project-dialog-title">
-        <DialogTitle id="add-project-dialog-title">Add Project</DialogTitle>
+        <DialogTitle id="add-project-dialog-title"><div style={{padding:'8px',paddingLeft:'16px',width:'100%',backgroundColor:'yellow',position:'absolute',top:'0',left:'0',right:'0'}}>Create new project</div></DialogTitle>
         <DialogContent >
-          <TextField label="Project Title" value={title} onChange={(event) => setTitle(event.target.value)} margin="normal" />
-          <TextField label="Project Details" value={details} onChange={(event) => setDetails(event.target.value)} margin="normal" />
-          <TextField label="Price Range" value={priceRange} onChange={(event) => setPriceRange(event.target.value)} margin="normal" />
-          <TextField label="Skills" value={skills} onChange={(event) => setSkills(event.target.value)} margin="normal" />
+          <br></br>
+          <br></br>
+          <Grid container >
+            <Grid item xs={12}>
+          <TextField fullWidth label="Project Title" value={title} onChange={(event) => setTitle(event.target.value)} margin="normal" />
+            </Grid>
+              <Grid item xs={12}>
+          <TextField fullWidth multiline rows={3} label="Project Details" value={details} onChange={(event) => setDetails(event.target.value)} margin="normal" />
+              </Grid>
+<Grid item xs={12}>
+          <TextField fullWidth label="Price Range" value={priceRange} onChange={(event) => setPriceRange(event.target.value)} margin="normal" />
+</Grid>
+  <Grid item xs={12}>
+          <TextField fullWidth label="Skills(Comma sperated)" value={skills} onChange={(event) => setSkills(event.target.value)} margin="normal" />
+  </Grid>
+    
+          </Grid>
           <input type="file" onChange={handleAddAttachment} />
           {attachments.map((attachment, index) => (
             <div key={index}>
@@ -59,12 +72,19 @@ const AddProjectButton = () => {
           ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Grid container spacing={2}>
+<Grid item xs={6}>
+          <Button fullWidth onClick={handleClose} sx={{backgroundColor:'yellow',color:'black'}} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} color="primary">
-            Submit
+</Grid>
+<Grid item xs={6}>
+
+          <Button fullWidth onClick={handleSubmit} sx={{backgroundColor:'yellow',color:'black'}} color="primary">
+            CREATE
           </Button>
+</Grid>
+          </Grid>
         </DialogActions>
       </Dialog>
     </div>
@@ -102,9 +122,9 @@ export default function Main(){
   );
 
   return (
-    <div>
+    <div style={{padding:'32px'}}>
       <Typography variant="h4" style={{margin:'16px',textAlign:'center'}}>{q&&q=='myproject'?'Your':'All'} Projects</Typography>
-      <Grid container sx={{marginLeft:'32px',marginRight:'32px'}} spacing={2}>
+      <Grid container spacing={3}>
         <Grid item xs={1}></Grid>
        
         <Grid item xs={10}>
@@ -128,21 +148,23 @@ export default function Main(){
       <Grid item xs={1}></Grid>
       {filteredProjects.map((project) => (
         <Grid key={project.uid} item xs={3}>
-        <Card sx={{maxWidth:'300px',height:'300px'}}>
+        <Card elevation={10} sx={{maxWidth:'100%'}}>
           <CardHeader
             title={project.title}
             subheader={`Published by ${project.publishername}`}
           />
           <CardContent>
-            <Typography variant="body1">{project.details.substring(0,project.details.length>20?20:project.details.length)+'...'}</Typography>
+            <Typography variant="body1">{project.details.substring(0,project.details.length>60?60:project.details.length)+'...'}</Typography>
+            </CardContent>
+            <CardActions>
             <Button
-              variant="contained"
-              color="primary"
+            sx={{color:'yellow'}}
+              
               href={`/project?id=${project.uid}`}
             >
-              Details
+              Open Details
             </Button>
-          </CardContent>
+            </CardActions>
         </Card>
         </Grid>
       ))}

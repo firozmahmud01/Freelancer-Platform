@@ -1,6 +1,8 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemButton, ListItemText, Rating, TextField, Typography } from "@mui/material";
+import { CloudDownload, Send } from "@mui/icons-material";
+import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Rating, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import {acceptbidrequest, bidrequest, getprojectdetails, loadmsg, sendmsg, submitreview} from './AllApi'
+import { Form } from "react-router-dom";
+import {acceptbidrequest, bidrequest, getprojectdetails, hostname, loadmsg, sendmsg, submitreview} from './AllApi'
 
 
 export default function Main(){
@@ -28,33 +30,105 @@ export default function Main(){
   return (
     <div>
       <PopupDialog open={open} onClose={()=>setOpen(false)} projectid={pid}/>
-      <Typography variant="h2">{project.title}</Typography>
-      <Typography variant="subtitle1">Price Range: {project.pricerange}</Typography>
-      <Typography variant="body1">Details: {project.details}</Typography>
-      <Typography variant="body1">Skills Required: {project.requirements}</Typography>
-      <Typography variant="body1">Attachments: {project.attachments}</Typography>
       <ReviewDialog open={review} onClose={()=>setReview(false)} projectid={pid}/>
-      {localStorage.getItem('userType') != "worker"&&project.worker&&<Button variant="contained" onClick={()=>setReview(true)}>Project is Complete</Button>}
-      {localStorage.getItem('userType') === "worker"&&!project.worker && (
-        <Button variant="contained" color="primary" onClick={handleBid}>Bid</Button>
-      )}
-      {project.message&&<InboxView msg={project.message} projectid={pid}/>}
-      {project?.biders?.length > 0 && (
-        <div>
-          <Typography variant="h3">Bidders:</Typography>
-          <List>
-            {project?.biders?.map((bidder) => (
-              <ListItem key={bidder.uid}>
-                <ListItemText primary={<Typography sx={{cursor:'pointer'}} onClick={e=>document.location='/profile/'+bidder.profile} >Name :{bidder.biddername}</Typography>} secondary={`Money Required: ${bidder.price}`} />
-                <ListItemText primary={`Time Required: ${bidder.time} days`} secondary={`Details: ${bidder.details}`} />
-                <ListItemButton ><Button onClick={e=>{
-                  acceptbidrequest(pid,bidder.profile);
-                }} variant="contained">Accept</Button></ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </div>
-      )}
+      <Grid container spacing={5}>
+        <Grid item xs={6}>
+          <div style={{width:'100%',padding:'32px'}}>
+          <Typography variant="h3">{project.title}</Typography>
+          <Typography variant="subtitle1">Published by {project.publishername}</Typography>
+          <br></br>
+          <Typography variant="h5">{project.pricerange}</Typography>
+          <br></br>
+          <br></br>
+          <Typography variant="body1">{project.details}</Typography>
+          <br></br>
+          <Typography variant="body1">Skills Required: {project.requirements}</Typography>
+          <br></br>
+          <br></br>
+          <br></br>
+          <Grid container>
+            <Grid item xs={9}>
+          <Typography variant="h5"><b>Files</b></Typography>
+          </Grid>
+          <Grid item xs={3}>
+            {localStorage.getItem('userType') === "worker"&&!project.worker && (
+              <Button variant="contained" sx={{color:'black',backgroundColor:'yellow'}} fullWidth color="primary" onClick={handleBid} >BID THIS PROJECT</Button>
+              )}
+              {localStorage.getItem('userType') != "worker"&&project.worker&&<Button variant="contained" fullWidth sx={{color:'black',backgroundColor:'yellow'}} onClick={()=>setReview(true)}>Project is Complete</Button>}
+          </Grid>
+          
+          </Grid>
+          <br></br>
+          {project?.attachments&&project?.attachments?.length>0&&(<Card elevation={10}>
+            <CardContent>
+              <List>
+                {JSON.parse(project?.attachments||'[]').map((item,index)=>{
+                  return (<ListItem key={index}>
+                    <ListItemText primary={<Typography variant="h6">{item}</Typography>}>
+                        </ListItemText>
+                        <ListItemIcon ><IconButton target="_blank" href={hostname+'/images/'+item}><CloudDownload sx={{width:'32px',height:'32px'}} color="primary"/></IconButton></ListItemIcon>
+                  </ListItem>)
+                })}
+              </List>
+            </CardContent>
+          </Card>)}
+          
+          
+          
+            </div>
+          
+</Grid>
+<Grid item xs={2}></Grid>
+<Grid item xs={4}>
+{project.message&&<InboxView msg={project.message} projectid={pid}/>}
+{project?.biders?.length > 0 && (
+            <div>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <Typography variant="h4">Bidders:</Typography>
+              
+                {project?.biders?.map((bidder) => (
+                  <div key={bidder.uid}>
+                    <br></br>
+                    <br></br>
+                  <Card sx={{maxWidth:'400px'}}>
+                    <CardContent>
+                  <Grid container spacing={2}>
+<Grid item xs={2}>
+<Avatar src={hostname+'/images/'+bidder.img} sx={{width:'50px',height:'50px',cursor:'pointer'}} onClick={e=>document.location='/profile/'+bidder.profile}></Avatar>
+</Grid>
+<Grid item xs={8}>
+<Typography sx={{cursor:'pointer'}} variant={'h6'} onClick={e=>document.location='/profile/'+bidder.profile}>{bidder.biddername}</Typography>
+<Typography>Time:{bidder.time} days</Typography>
+</Grid>
+<Grid item xs={2}>
+                  <Typography>{bidder.price}$</Typography>
+</Grid>
+<Grid item xs={12}></Grid>
+<Grid item xs={12}>
+  <Typography>{bidder.details}</Typography>
+</Grid>
+
+</Grid>
+                  
+                  </CardContent>
+                  <CardActions>
+                  <Button onClick={e=>{
+                      acceptbidrequest(pid,bidder.profile);
+                    }} color="secondary">Accept</Button>
+                  </CardActions>
+                  </Card>
+                  </div>
+                ))}
+              
+              
+            </div>
+          )}
+</Grid>
+
+      </Grid>
     </div>
   );
 
@@ -96,7 +170,7 @@ const PopupDialog = ({ open, onClose ,projectid}) => {
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Add Bid</DialogTitle>
+      <DialogTitle>Bid this project</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
@@ -110,21 +184,24 @@ const PopupDialog = ({ open, onClose ,projectid}) => {
         />
         <TextField
           margin="dense"
+          id="details"
+          label="Notes"
+          multiline
+          rows={4}
+          value={details}
+          onChange={handleDetailsChange}
+          fullWidth
+        />
+        <TextField
+          margin="dense"
           id="time"
-          label="Required Time"
+          label="Required Time(In Days)"
           type="number"
           value={time}
           onChange={handleTimeChange}
           fullWidth
         />
-        <TextField
-          margin="dense"
-          id="details"
-          label="Sort Details"
-          value={details}
-          onChange={handleDetailsChange}
-          fullWidth
-        />
+        
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">
@@ -169,73 +246,89 @@ if(repeater==undefined){
  
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-    }}>
+    <Card elevation={10} sx={{width:'400px',position:'absolute',bottom:'64px',right:'64px'}}>
+      
+      <CardContent >
+    <Grid container sx={{
+    width:'380px'
+    }} spacing={2}>
+      <Grid item xs={12}>
+        <div style={{width:'100%',padding:'16px',backgroundColor:'yellow',position:'absolute',top:'0',left:'0'}}>
+      <Typography variant="h5" color={'black'}>Inbox</Typography>
+      </div>
+      </Grid>
+      <Grid item xs={12}></Grid>
+      <Grid item xs={12}></Grid>
+      <Grid item xs={12}>
       <List sx={{
-    flexGrow: 1,
+    height:'400px',
+    width:'380px',
     overflowY: 'scroll',
-    marginBottom: 2,
+    
   }}>
         {messages.map((message) => (
           <ListItem key={message.id} sx={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-start',
-            marginBottom: 1,
-            marginRight: 4,
-            marginLeft: 4,
+            
           }}>
             {message.sender === localStorage.getItem('profile') ? (
               <div style={{
-                backgroundColor: 'red',
-                color: 'white',
-                borderRadius: '10px',
-                padding: 2,
+                
+                color: 'black',
+                
                 maxWidth: '80%',
                 alignSelf: 'flex-end',
               }}>
-                <Typography variant="body2">{message.msg}</Typography>
-                <Typography variant="caption">{message.time}</Typography>
+              <Card elevation={10} sx={{backgroundColor:'#FDF9EA',borderRadius:'20px' ,padding:'8px',}}>
+                <CardContent>
+              
+                <Typography variant="h6">{message.msg}</Typography>
+                <Typography variant="caption">You - {message.time}</Typography>
+              
+              </CardContent>
+              </Card>
               </div>
             ) : (
               <div style={{
-                backgroundColor: '#e1e1e1',
-                borderRadius: '10px',
-                padding: 1,
+                
+                color: 'black',
                 maxWidth: '80%',
               }}>
-                <Typography variant="body2">{message.msg}</Typography>
+                <Card elevation={10} sx={{backgroundColor:'white',borderRadius:'20px' ,padding:'8px',}}>
+                <CardContent>
+                <Typography variant="h6">{message.msg}</Typography>
                 <Typography variant="caption">
                   {message.sender} - {message.time}
                 </Typography>
+                </CardContent>
+                </Card>
               </div>
             )}
           </ListItem>
         ))}
       </List>
-      <form onSubmit={handleMessageSubmit} style={{
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: 2,
-  }}>
-        <input
+      </Grid>
+      <Grid item xs={10}>
+        <TextField
           type="text"
-          style={{
-            flexGrow: 1,
-            marginRight: 1,
-          }}
+          fullWidth
           placeholder="Type your message"
           value={newMessage}
           onChange={(event) => setNewMessage(event.target.value)}
-        />
-        <button style={{
-    marginLeft: 1,
-  }} type="submit">Send</button>
-      </form>
-    </div>
+          />
+        </Grid>
+        <Grid item xs={2}>
+  <IconButton sx={{marginTop:'8px'}} onClick={handleMessageSubmit} >
+    <Send color="primary"/>
+  </IconButton>
+  </Grid>
+      </Grid>
+      </CardContent>
+      </Card>
+
+
   );
 }
 
@@ -275,7 +368,7 @@ const ReviewDialog = ({ projectid,open, onClose }) => {
             name="rating"
             value={rating}
             onChange={handleRatingChange}
-            precision={0.5}
+            precision={1}
           />
         </Box>
         <TextField
