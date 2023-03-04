@@ -1,5 +1,5 @@
 const express=require('express');
-const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails, requestbit, acceptbidder, loadmessage, sendmessage } = require('./database');
+const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails, requestbit, acceptbidder, loadmessage, sendmessage, submitreview } = require('./database');
 const r=express.Router()
 module.exports= r;
 
@@ -166,4 +166,20 @@ r.post('/acceptbid',async(req,res)=>{
         }else{
             res.json({status:'Failed to add your bid!'});
         }
+    })
+
+    r.post('/submitreview',async(req,res)=>{
+        let {projectid,rating,comment,cookie}=req.body;
+        if(!projectid||!rating||!comment||!cookie){
+            res.json({status:'Failed to work'});
+            return;
+        }
+
+let data=await submitreview(projectid,rating,comment,cookie)
+if(data){
+res.json({status:'OK'});
+}else{
+    res.json({status:'Failed to submit'});
+}
+
     })

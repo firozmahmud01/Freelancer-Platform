@@ -1,6 +1,6 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemButton, ListItemText, Rating, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import {acceptbidrequest, bidrequest, getprojectdetails, loadmsg, sendmsg} from './AllApi'
+import {acceptbidrequest, bidrequest, getprojectdetails, loadmsg, sendmsg, submitreview} from './AllApi'
 
 
 export default function Main(){
@@ -33,7 +33,7 @@ export default function Main(){
       <Typography variant="body1">Details: {project.details}</Typography>
       <Typography variant="body1">Skills Required: {project.requirements}</Typography>
       <Typography variant="body1">Attachments: {project.attachments}</Typography>
-      <ReviewDialog open={review} onClose={()=>setReview(false)}/>
+      <ReviewDialog open={review} onClose={()=>setReview(false)} projectid={pid}/>
       {localStorage.getItem('userType') != "worker"&&project.worker&&<Button variant="contained" onClick={()=>setReview(true)}>Project is Complete</Button>}
       {localStorage.getItem('userType') === "worker"&&!project.worker && (
         <Button variant="contained" color="primary" onClick={handleBid}>Bid</Button>
@@ -245,7 +245,7 @@ if(repeater==undefined){
 
 
 
-const ReviewDialog = ({ open, onClose }) => {
+const ReviewDialog = ({ projectid,open, onClose }) => {
   
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -259,15 +259,13 @@ const ReviewDialog = ({ open, onClose }) => {
   };
 
   const handleSubmit = () => {
-    // Send review data to API endpoint
-    // ...
-    // Close the dialog
+    submitreview(projectid,rating,comment)
     onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle >Submit Review</DialogTitle>
+      <DialogTitle >Submit review about this worker</DialogTitle>
       <DialogContent >
         <Typography variant="subtitle1" gutterBottom>
           Rating:

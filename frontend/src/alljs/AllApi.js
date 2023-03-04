@@ -199,6 +199,21 @@ exports.sendmsg=async(projectid,msg)=>{
     }
 
 
+    exports.submitreview=async(projectid,rating,comment)=>{
+        let res=await fetch(hostname+'/api/submitreview',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({projectid,rating,comment,'cookie':localStorage.getItem('cookie')}),
+        })
+        let da=await res.json();
+        if(da.status=='OK'){
+            alert('Thank you for your valuable review')
+            document.location='/'
+        }else{
+            alert(da.status);
+        }
+    }
+
    
 
     

@@ -43,7 +43,9 @@ export default function Main(){
       
       <Typography variant="h5"><b>Reviews</b></Typography>
       <br></br>
-      <Typography variant="h6">No reviews yet!</Typography>
+      {data?.reviews?(data?.reviews.map((item,index)=>{
+        return (<div keys={item.uid}><ReviewItem rating={item.review} name={item.reviewer} review={item.comment}/></div>)
+      })):(<Typography variant="h6">No reviews yet!</Typography>)}
 
           <br></br>
           <br></br>

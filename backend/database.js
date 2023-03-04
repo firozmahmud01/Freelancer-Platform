@@ -22,6 +22,7 @@ let con = mysql.createConnection({
     con.query("CREATE TABLE IF NOT EXISTS projects(uid INTEGER PRIMARY KEY AUTO_INCREMENT,title TEXT,requirements TEXT,details TEXT,attachments TEXT,pricerange TEXT,publishername TEXT,publisheruid TEXT,worker TEXT);")
     con.query("CREATE TABLE IF NOT EXISTS bidlist(uid INTEGER PRIMARY KEY AUTO_INCREMENT,price TEXT,time TEXT,details TEXT,profile TEXT,img TEXT,biddername TEXT,projectid TEXT);")
     con.query("CREATE TABLE IF NOT EXISTS messages(uid INTEGER PRIMARY KEY AUTO_INCREMENT,msg TEXT,time TEXT,sender TEXT,projectid TEXT);")
+    con.query("CREATE TABLE IF NOT EXISTS userreview(uid INTEGER PRIMARY KEY AUTO_INCREMENT,comment TEXT,reviewer TEXT,reviewerprofile TEXT,review TEXT,profile TEXT);")
     
     
   });
@@ -165,9 +166,11 @@ exports.createUser=async(name,email,pass,userType)=>{
 
 exports.getProfileDetails=async(link)=>{
   let data=await getData('SELECT * FROM normaluser WHERE profile=?',[link]);
+  let review=await getData('SELECT * FROM userreview WHERE profile=?',[link])
+
   if(data.length>0){
     delete data[0].pass
-    return data[0];
+    return {...data[0],'reviews':review};
   }
 }
 
@@ -289,6 +292,19 @@ exports.sendmessage=async(token,projectid,msg)=>{
   await getData('INSERT INTO messages(msg,time,sender,projectid) VALUES(?,?,?,?)',[msg,Date.now(),user[0].profile,projectid])
   return 'OK'
 }
+
+exports.submitreview=async(projectid,rating,comment,cookie)=>{
+ 
+  let user=await getData('SELECT * FROM normaluser WHERE token=?',[cookie])
+  if(user.length<=0)return ;
+  let project=await getData('SELECT * FROM projects WHERE uid=? AND publisheruid=?',[projectid,user[0].uid]);
+  if(project.length<=0)return;
+  await getData('DELETE FROM projects WHERE uid=? AND publisheruid=?',[projectid,user[0].uid]);
+  await getData('DELETE FROM messages WHERE projectid=?',[project[0].uid]);
+  await getData('INSERT INTO userreview(comment,reviewer,reviewerprofile,review,profile) VALUES(?,?,?,?,?);',[comment,user[0].name,user[0].profile,rating,project[0].worker])
+return 'OK'
+}
+
 exports.requestbit=async(price,time,details,projectid,cookie)=>{
   
   let user=await getData('SELECT * FROM normaluser WHERE token=?',[cookie]);
@@ -300,7 +316,9 @@ exports.requestbit=async(price,time,details,projectid,cookie)=>{
 exports.acceptbidder=async(token,projectid,bidderprofile)=>{
   let user=await getData('SELECT uid FROM normaluser WHERE token=?',[token]);
   if(user.length<=0)return ;
+  
   await getData('UPDATE projects SET worker=? WHERE publisheruid=? AND uid=?',[bidderprofile,user[0].uid,projectid])
+  await getData('DELETE FROM bidlist WHERE projectid=?',[projectid,user[0].uid]);
   return 'OK'
 
 }
