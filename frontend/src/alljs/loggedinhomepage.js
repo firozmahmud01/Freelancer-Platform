@@ -128,7 +128,8 @@ export default function Main(){
           </CardContent>
         </Card>
       ))}
-      <AddProjectButton/>
+
+      {(localStorage.getItem('userType')!='worker'&&<AddProjectButton/>)}
     </div>
   );
 

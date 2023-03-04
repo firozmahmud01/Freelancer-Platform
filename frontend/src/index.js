@@ -89,7 +89,7 @@ function AvatarFunction(){
     </ListItemIcon>
     Profile
   </MenuItem>
-  <MenuItem onClick={()=>{document.location='/myprojects'}}>
+  <MenuItem onClick={()=>{document.location='/?q=myproject'}}>
     <ListItemIcon>
       <AccountTree color='secondary' fontSize="small" />
     </ListItemIcon>

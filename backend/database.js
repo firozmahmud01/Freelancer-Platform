@@ -21,7 +21,7 @@ let con = mysql.createConnection({
     con.query("CREATE TABLE IF NOT EXISTS normaluser(uid INTEGER PRIMARY KEY AUTO_INCREMENT,name TEXT,email TEXT,pass TEXT,token TEXT,userType TEXT,balance INTEGER DEFAULT 0,img TEXT,profile TEXT DEFAULT 0,details TEXT,skills TEXT,portfolio TEXT,experience TEXT,education TEXT,address TEXT,hourlyrate TEXT);")
     con.query("CREATE TABLE IF NOT EXISTS projects(uid INTEGER PRIMARY KEY AUTO_INCREMENT,title TEXT,requirements TEXT,details TEXT,attachments TEXT,pricerange TEXT,publishername TEXT,publisheruid TEXT,worker TEXT);")
     con.query("CREATE TABLE IF NOT EXISTS bidlist(uid INTEGER PRIMARY KEY AUTO_INCREMENT,price TEXT,time TEXT,details TEXT,profile TEXT,img TEXT,biddername TEXT,projectid TEXT);")
-    con.query("CREATE TABLE IF NOT EXISTS messages(uid INTEGER PRIMARY KEY AUTO_INCREMENT,msg TEXT,time TEXT,sender TEXT,receiver TEXT,projectid TEXT);")
+    con.query("CREATE TABLE IF NOT EXISTS messages(uid INTEGER PRIMARY KEY AUTO_INCREMENT,msg TEXT,time TEXT,sender TEXT,projectid TEXT);")
     
     
   });
@@ -175,7 +175,7 @@ exports.getProfileDetails=async(link)=>{
 exports.checkauth=async(user,pass)=>{
     let upass=crypto.createHash('sha256').update(pass).digest('base64');
     let salt = crypto.randomBytes(27).toString('hex'); 
-    console.log(user,upass)
+    
     const cmd="SELECT uid,profile,img,name,balance,userType FROM normaluser WHERE email=? AND pass=?;"
     let data=await getData(cmd,[user,upass])
     if((data&&data[0]?.uid)||data?.uid){
@@ -240,13 +240,15 @@ return 'OK';
 }
 
 
-exports.getProjectlist=async(query)=>{
-  let cmd='SELECT uid,title,publishername,details,requirements FROM projects WHERE worker IS NULL'+(query?' AND (title LIKE ? OR details LIKE ? OR skills LIKE ?)':'')
+exports.getProjectlist=async(token)=>{
+  let cmd='SELECT uid,title,publishername,details,requirements FROM projects WHERE worker IS NULL'
   let prm=[]
-  if(query){
-    prm.push('%'+query+"%")
-    prm.push('%'+query+"%")
-    prm.push('%'+query+"%")
+  if(token){
+    let da=await getData('SELECT * FROM normaluser WHERE token=?',[token])
+    if(da.length<=0)return;
+    cmd='SELECT uid,title,publishername,details,requirements FROM projects WHERE publisheruid=? OR worker=?'
+    prm.push(da[0].uid)
+    prm.push(da[0].profile)
   }
   let da=await getData(cmd,prm)
   return da;
@@ -276,10 +278,29 @@ if(user[0].profile==data[0].worker){
   
 }
 
+exports.loadmessage=async(projectid)=>{
+  let msg=await getData('SELECT * FROM messages WHERE projectid=?',[projectid])
+  return msg;
+}
+
+exports.sendmessage=async(token,projectid,msg)=>{
+  let user=await getData('SELECT * FROM normaluser WHERE token=?',[token]);
+  if(user.length<=0)return;
+  await getData('INSERT INTO messages(msg,time,sender,projectid) VALUES(?,?,?,?)',[msg,Date.now(),user[0].profile,projectid])
+  return 'OK'
+}
 exports.requestbit=async(price,time,details,projectid,cookie)=>{
-  // bidlist(uid ,price ,time ,details ,profile ,img ,biddername ,projectid
+  
   let user=await getData('SELECT * FROM normaluser WHERE token=?',[cookie]);
   if(user.length<=0)return;
   await getData('INSERT INTO bidlist(price,time,details,projectid,profile,img,biddername) VALUES(?,?,?,?,?,?,?)',[price,time,details,projectid,user[0].profile,user[0].img,user[0].name])
   return 'OK';
+}
+
+exports.acceptbidder=async(token,projectid,bidderprofile)=>{
+  let user=await getData('SELECT uid FROM normaluser WHERE token=?',[token]);
+  if(user.length<=0)return ;
+  await getData('UPDATE projects SET worker=? WHERE publisheruid=? AND uid=?',[bidderprofile,user[0].uid,projectid])
+  return 'OK'
+
 }

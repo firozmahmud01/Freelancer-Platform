@@ -1,5 +1,5 @@
 const express=require('express');
-const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails, requestbit } = require('./database');
+const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails, requestbit, acceptbidder, loadmessage, sendmessage } = require('./database');
 const r=express.Router()
 module.exports= r;
 
@@ -84,9 +84,9 @@ r.post('/uploadproject',async (req,res)=>{
     
 })
     
-r.get('/projectlist',async(req,res)=>{
-    const {query}=req.query;
-    let data=await getProjectlist(query);
+r.post('/projectlist',async(req,res)=>{
+    const {token}=req.body;
+    let data=await getProjectlist(token);
     if(data){
         res.json({status:'OK',data})
     }else{
@@ -108,8 +108,50 @@ r.post('/projectdetails',async(req,res)=>{
         res.json({status:'Failed to load details'});
     }
 })
-   
 
+r.post('/loadmsg',async(req,res)=>{
+    const {projectid}=req.body;
+    if(!projectid){
+        res.json({status:'Failed to proccess'});
+        return ;
+    }
+    let data=await loadmessage(projectid);
+    if(data){
+        res.json({status:'OK',data})
+    }else{
+        res.json({status:'Failed to load msg'});
+    }
+})
+
+r.post('/sendmsg',async(req,res)=>{
+    const {token,projectid,msg}=req.body;
+    if(!token||!projectid||!msg){
+        res.json({status:'Failed to proccess'});
+        return ;
+    }
+    let data=await sendmessage(token,projectid,msg);
+    if(data){
+        res.json({status:'OK'})
+    }else{
+        res.json({status:'Failed to load msg'});
+    }
+})
+
+r.post('/acceptbid',async(req,res)=>{
+    const {token,projectid,bidderprofile}=req.body;
+    if(!token||!projectid||!bidderprofile){
+        res.json({status:'Failed to accept'});
+        return ;
+
+    }
+
+    let data=await acceptbidder(token,projectid,bidderprofile);
+    if(data){
+        res.json({status:'OK'})
+    }else{
+        res.json({status:'Failed to accept you request'})
+    }
+})
     
     r.post('/bidrequest',async(req,res)=>{
         const {price,time,details,cookie,projectuid}=req.body;

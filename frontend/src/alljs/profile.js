@@ -18,7 +18,7 @@ export default function Main(){
   
   if(!data){
     getprofiledetails(profile).then(da=>{
-      if(!da?.education){
+      if(!da?.education&&localStorage.getItem('profile')==profile){
         alert('Please comple your profile!');
         document.location='/settings'
         return ;
@@ -98,7 +98,7 @@ function ExperienceItem({title,time,details}){
 }
 
 function Portfolio({imgs}){
-  let all=imgs.map((item,index)=>{
+  let all=imgs?.map((item,index)=>{
     return (<Grid xs={3} item keys={index}>
       <Card sx={{maxWidth:'200px'}}>
         <CardMedia sx={{height:'200px'}} image={hostname+'/images/'+item}></CardMedia>
@@ -145,7 +145,7 @@ function ProfileUpper({img,name,jobtitle,address,details,hourlyrate}){
           <CardMedia sx={{height:'150px'}} image={hostname+'/images/'+img}></CardMedia>
         </Card>
         <br></br>
-        <Typography variant="h6">{hourlyrate+'$/Hour'}</Typography>
+        {hourlyrate&&<Typography variant="h6">{hourlyrate+'$/Hour'}</Typography>}
         <Typography variant="h6">{address}</Typography>
       </Grid>
 

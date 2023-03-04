@@ -1,11 +1,11 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemText, Rating, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, List, ListItem, ListItemButton, ListItemText, Rating, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-
-import {bidrequest, getprojectdetails} from './AllApi'
+import {acceptbidrequest, bidrequest, getprojectdetails, loadmsg, sendmsg} from './AllApi'
 
 
 export default function Main(){
    const [project,setProject]=useState()
+   const [review,setReview]=useState(false);
    const [open,setOpen]=useState(false);
    const searchParams = new URLSearchParams(window.location.search);
    const pid = searchParams.get("id")||undefined;
@@ -33,17 +33,23 @@ export default function Main(){
       <Typography variant="body1">Details: {project.details}</Typography>
       <Typography variant="body1">Skills Required: {project.requirements}</Typography>
       <Typography variant="body1">Attachments: {project.attachments}</Typography>
-      {localStorage.getItem('userType') === "worker" && (
+      <ReviewDialog open={review} onClose={()=>setReview(false)}/>
+      {localStorage.getItem('userType') != "worker"&&project.worker&&<Button variant="contained" onClick={()=>setReview(true)}>Project is Complete</Button>}
+      {localStorage.getItem('userType') === "worker"&&!project.worker && (
         <Button variant="contained" color="primary" onClick={handleBid}>Bid</Button>
       )}
+      {project.message&&<InboxView msg={project.message} projectid={pid}/>}
       {project?.biders?.length > 0 && (
         <div>
           <Typography variant="h3">Bidders:</Typography>
           <List>
             {project?.biders?.map((bidder) => (
-              <ListItem key={bidder.id}>
-                <ListItemText primary={`Name: ${bidder.name}`} secondary={`Money Required: ${bidder.money}`} />
-                <ListItemText primary={`Time Required: ${bidder.time}`} secondary={`Bio: ${bidder.bio}`} />
+              <ListItem key={bidder.uid}>
+                <ListItemText primary={<Typography sx={{cursor:'pointer'}} onClick={e=>document.location='/profile/'+bidder.profile} >Name :{bidder.biddername}</Typography>} secondary={`Money Required: ${bidder.price}`} />
+                <ListItemText primary={`Time Required: ${bidder.time} days`} secondary={`Details: ${bidder.details}`} />
+                <ListItemButton ><Button onClick={e=>{
+                  acceptbidrequest(pid,bidder.profile);
+                }} variant="contained">Accept</Button></ListItemButton>
               </ListItem>
             ))}
           </List>
@@ -137,92 +143,101 @@ const PopupDialog = ({ open, onClose ,projectid}) => {
 
 
 
-const Inbox = () => {
-  const [messages, setMessages] = useState([]);
-  const [showDialog, setShowDialog] = useState(false);
-  const [recipient, setRecipient] = useState("");
-  const [messageBody, setMessageBody] = useState("");
+let repeater=undefined;
 
-  useEffect(() => {
-    // Here you would make an API call to retrieve the user's messages
-    // and update the messages state with the response data
-    const fetchMessages = async () => {
-      try {
-        const response = await fetch("/api/messages");
-        const data = await response.json();
-        setMessages(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchMessages();
-  }, []);
+const InboxView = ({msg,projectid}) => {
+ 
+  const [messages, setMessages] = useState(msg);
+  const [newMessage,setNewMessage]=useState('')
+ 
+if(repeater==undefined){
+  repeater=setInterval(()=>{
+    loadmsg(projectid).then(da=>{
+      setMessages(da);
+    })
+  },2000)
+}
 
-  const handleSendMessage = async () => {
-    // Here you would make an API call to send the message
-    // and add the message to the messages state after success response
-    try {
-      const response = await fetch("/api/sendMessage", {
-        method: "POST",
-        body: JSON.stringify({ recipient, messageBody }),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-      const data = await response.json();
-      setMessages([...messages, data]);
-      setShowDialog(false);
-      setRecipient("");
-      setMessageBody("");
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const handleMessageSubmit=(e)=>{
+    e.preventDefault()
+    if(newMessage){
+    sendmsg(projectid,newMessage).then(da=>{
+      setNewMessage('')
+    })
+  }
+  }
+ 
 
   return (
-    <>
-      <Button variant="contained" color="primary" onClick={() => setShowDialog(true)}>Compose</Button>
-      <List>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+    }}>
+      <List sx={{
+    flexGrow: 1,
+    overflowY: 'scroll',
+    marginBottom: 2,
+  }}>
         {messages.map((message) => (
-          <ListItem key={message.id}>
-            <ListItemText primary={message.sender} secondary={message.subject} />
+          <ListItem key={message.id} sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            marginBottom: 1,
+            marginRight: 4,
+            marginLeft: 4,
+          }}>
+            {message.sender === localStorage.getItem('profile') ? (
+              <div style={{
+                backgroundColor: 'red',
+                color: 'white',
+                borderRadius: '10px',
+                padding: 2,
+                maxWidth: '80%',
+                alignSelf: 'flex-end',
+              }}>
+                <Typography variant="body2">{message.msg}</Typography>
+                <Typography variant="caption">{message.time}</Typography>
+              </div>
+            ) : (
+              <div style={{
+                backgroundColor: '#e1e1e1',
+                borderRadius: '10px',
+                padding: 1,
+                maxWidth: '80%',
+              }}>
+                <Typography variant="body2">{message.msg}</Typography>
+                <Typography variant="caption">
+                  {message.sender} - {message.time}
+                </Typography>
+              </div>
+            )}
           </ListItem>
         ))}
       </List>
-      <Dialog open={showDialog} onClose={() => setShowDialog(false)}>
-        <DialogTitle>New Message</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Enter the recipient and message details below.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Recipient"
-            fullWidth
-            value={recipient}
-            onChange={(e) => setRecipient(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Message"
-            fullWidth
-            multiline
-            rows={4}
-            value={messageBody}
-            onChange={(e) => setMessageBody(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowDialog(false)}>Cancel</Button>
-          <Button onClick={handleSendMessage} color="primary">Send</Button>
-        </DialogActions>
-      </Dialog>
-    </>
+      <form onSubmit={handleMessageSubmit} style={{
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: 2,
+  }}>
+        <input
+          type="text"
+          style={{
+            flexGrow: 1,
+            marginRight: 1,
+          }}
+          placeholder="Type your message"
+          value={newMessage}
+          onChange={(event) => setNewMessage(event.target.value)}
+        />
+        <button style={{
+    marginLeft: 1,
+  }} type="submit">Send</button>
+      </form>
+    </div>
   );
-};
-
-
+}
 
 
 

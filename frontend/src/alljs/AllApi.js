@@ -52,7 +52,11 @@ exports.signupuser=async(name,email,pass,userType)=>{
 }
 
     exports.getprojectlist=async(query)=>{
-        let res=await fetch(hostname+'/api/projectlist'+(query?'?query='+query:''))
+        let res=await fetch(hostname+'/api/projectlist',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: query!='myproject'?'':JSON.stringify({token:localStorage.getItem('cookie')}),
+        })
         let da=await res.json();
         if(da.status=='OK'){
             return da.data;
@@ -132,10 +136,50 @@ exports.signupuser=async(name,email,pass,userType)=>{
         }
     }
 
+exports.loadmsg=async(projectid)=>{
+    let res=await fetch(hostname+'/api/loadmsg',{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({projectid}),
+    })
+    let da=await res.json();
+        if(da.status=='OK'){
+            return da.data;
+        }else{
+            alert(da.status);
+        }
+}
 
-    exports.previousmessageinbox=async()=>{
 
+exports.sendmsg=async(projectid,msg)=>{
+    let res=await fetch(hostname+'/api/sendmsg',{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({projectid,msg,token:localStorage.getItem('cookie')}),
+    })
+    let da=await res.json();
+        if(da.status=='OK'){
+            return da.data;
+        }else{
+            alert(da.status);
+        }
+}
+    exports.acceptbidrequest=async(projectid,bidderprofile)=>{
+        
+        let res=await fetch(hostname+'/api/acceptbid',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({token:localStorage.getItem('cookie'),projectid,bidderprofile}),
+        })
+        let da=await res.json();
+        if(da.status=='OK'){
+            document.location.reload();
+        }else{
+            alert(da.status);
+        }
     }
+
+    
 
     exports.bidrequest=async(price,time,details,projectuid)=>{
         let res=await fetch(hostname+'/api/bidrequest',{
