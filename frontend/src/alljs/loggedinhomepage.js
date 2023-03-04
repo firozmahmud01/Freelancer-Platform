@@ -1,4 +1,5 @@
-import { Button, Card, CardContent, CardHeader, CardMedia, Dialog, DialogActions, DialogContent, DialogTitle, Fab, TextField, Typography } from "@mui/material";
+import { Search } from "@mui/icons-material";
+import { Button, Card, CardContent, CardHeader, CardMedia, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, InputAdornment, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getprofiledetails, getprojectdetails, getprojectlist, uploadproject } from "./AllApi";
 
@@ -102,16 +103,32 @@ export default function Main(){
 
   return (
     <div>
-      <Typography variant="h4">Projects</Typography>
+      <Typography variant="h4" style={{margin:'16px',textAlign:'center'}}>{q&&q=='myproject'?'Your':'All'} Projects</Typography>
+      <Grid container sx={{marginLeft:'32px',marginRight:'32px'}} spacing={2}>
+        <Grid item xs={1}></Grid>
+       
+        <Grid item xs={10}>
       <TextField
         label="Search projects"
+        placeholder='Type here'
         value={searchTerm}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
         onChange={handleSearchChange}
         fullWidth
         margin="normal"
       />
+</Grid>
+
+      <Grid item xs={1}></Grid>
       {filteredProjects.map((project) => (
-        <Card key={project.uid}>
+        <Grid key={project.uid} item xs={3}>
+        <Card sx={{maxWidth:'300px',height:'300px'}}>
           <CardHeader
             title={project.title}
             subheader={`Published by ${project.publishername}`}
@@ -127,8 +144,9 @@ export default function Main(){
             </Button>
           </CardContent>
         </Card>
+        </Grid>
       ))}
-
+</Grid>
       {(localStorage.getItem('userType')!='worker'&&<AddProjectButton/>)}
     </div>
   );

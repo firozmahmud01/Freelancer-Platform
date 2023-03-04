@@ -83,7 +83,7 @@ function PortfolioSection({images}){
       })
                 }} accept="image/*" type="file"/>
                 <UploadCardDialog open={open} setOpen={setOpen} image={image}/>
-    <Paper elevation={10} sx={{marginTop:'64px',marginLeft:'12%', padding:'32px',width:'75%'}}>
+    <Paper elevation={10} sx={{marginTop:'64px', padding:'32px',width:'100%'}}>
     <Typography variant="h5"><b>All Portfolio Pictures:</b></Typography>
     
                 
@@ -163,65 +163,98 @@ function ProfileSection({names,emails,bios,details,hourlyrate,addres}){
       };
     
       return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{width:'80%',marginLeft:'10%'}}>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
           <TextField
             label="Name"
+            fullWidth
             value={name}
             onChange={(event) => setName(event.target.value)}
             required
           />
-          <TextField
-            label="About Your self"
-            value={detail}
-            multiline
-            elevation={3}
-            onChange={(event) => setDetails(event.target.value)}
-            required
-          />
-          <TextField
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-          <TextField
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-          <TextField
-            label="Skills(Comma Separated!)"
-            multiline
-            required
-            rows={4}
-            value={bio}
-            onChange={(event) => setBio(event.target.value)}
-          />
-          <TextField
-            label="Address"
-            multiline
-            required
-            rows={4}
-            value={address}
-            onChange={(event) => setAddress(event.target.value)}
-          />
+          </Grid>
+          <Grid item xs={6}>
           <TextField
             label="Hourly Rate"
             type="number"
+            fullWidth
             required
             value={hourlyRate}
             onChange={(event) => setHourlyRate(event.target.value)}
           />
-          <Button type="submit" variant="contained" color="primary">
+           </Grid>
+          <Grid item xs={6}>
+          <TextField
+            label="Email"
+            type="email"
+            fullWidth
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
+          </Grid>
+          <Grid item xs={6}>
+          <TextField
+            label="Password"
+            type="password"
+            fullWidth
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+          />
+          </Grid>
+          <Grid item xs={6}>
+          <TextField
+            label="Skills(Comma Separated!)"
+            required
+            fullWidth
+            multiline
+            rows={4}
+            value={bio}
+            onChange={(event) => setBio(event.target.value)}
+          />
+           </Grid>
+           <Grid item xs={6}>
+          <TextField
+            label="Address"
+            multiline
+            required
+            fullWidth
+            rows={4}
+            value={address}
+            onChange={(event) => setAddress(event.target.value)}
+          />
+          </Grid>
+          
+           <Grid item xs={6}>
+          <TextField
+          fullWidth
+            label="About Your self"
+            value={detail}
+            multiline
+            rows={4}
+            elevation={3}
+            onChange={(event) => setDetails(event.target.value)}
+            required
+          />
+          </Grid>
+           <Grid item xs={6}></Grid>
+           <Grid item xs={5}></Grid>
+           <Grid item xs={2}>
+          <Button fullWidth type="submit" variant="contained" color="primary">
             Update Profile
           </Button>
+          </Grid>
+          <Grid item xs={5}></Grid>
+          </Grid>
         </form>
       );
         
 }
+
+
+
 function EducationSection({educat}){
       let data;
       if(educat){
@@ -251,13 +284,25 @@ function EducationSection({educat}){
       };
     
       return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{width:'80%',marginLeft:'10%'}}>
           {education.map((edu, index) => (
             <div key={index}>
+              
+              <Grid container spacing={2}>
+                <Grid item xs={11}>
               <Typography variant="h6">Education {index + 1}</Typography>
+              </Grid>
+              
+              <Grid item xs={1}>
+              <IconButton edge={'end'} onClick={() => handleRemoveEducation(index)}>
+                <Delete />
+              </IconButton>
+              </Grid>
+<Grid item xs={6}>
               <TextField
                 label="Program Name"
                 value={edu.programName}
+                fullWidth
                 onChange={(event) =>
                   setEducation([
                     ...education.slice(0, index),
@@ -267,9 +312,15 @@ function EducationSection({educat}){
                 }
                 required
               />
+
+</Grid>
+
+
+<Grid item xs={6}>
               <TextField
                 label="School/College Name"
                 value={edu.schoolName}
+                fullWidth
                 onChange={(event) =>
                   setEducation([
                     ...education.slice(0, index),
@@ -278,10 +329,15 @@ function EducationSection({educat}){
                   ])
                 }
                 required
-              />
+                />
+                </Grid>
+
+
+    <Grid item xs={6}>
               <TextField
                 label="Start Year"
                 type="number"
+                fullWidth
                 value={edu.startYear}
                 onChange={(event) =>
                   setEducation([
@@ -292,9 +348,13 @@ function EducationSection({educat}){
                 }
                 required
               />
+</Grid>
+
+<Grid item xs={6}>
               <TextField
                 label="Start Month"
                 type="number"
+                fullWidth
                 value={edu.startMonth}
                 onChange={(event) =>
                   setEducation([
@@ -305,10 +365,16 @@ function EducationSection({educat}){
                 }
                 required
               />
+</Grid>
+
+<Grid item xs={12}>
               <Typography variant="body1">to</Typography>
+              </Grid>
+              <Grid item xs={6}>
               <TextField
                 label="End Year"
                 type="number"
+                fullWidth
                 value={edu.endYear}
                 onChange={(event) =>
                   setEducation([
@@ -319,9 +385,13 @@ function EducationSection({educat}){
                 }
                 required
               />
+</Grid>
+
+<Grid item xs={6}>
               <TextField
                 label="End Month"
                 type="number"
+                fullWidth
                 value={edu.endMonth}
                 onChange={(event) =>
                   setEducation([
@@ -332,9 +402,13 @@ function EducationSection({educat}){
                 }
                 required
               />
+</Grid>
+
+<Grid item xs={6}>
               <TextField
                 label="Result"
                 value={edu.result}
+                fullWidth
                 onChange={(event) =>
                   setEducation([
                     ...education.slice(0, index),
@@ -344,17 +418,24 @@ function EducationSection({educat}){
                 }
                 required
               />
-              <IconButton onClick={() => handleRemoveEducation(index)}>
-                <Delete />
-              </IconButton>
+              </Grid>
+
+
+              </Grid>
             </div>
           ))}
-          <IconButton onClick={handleAddEducation}>
-            <AddCircleOutline />
-          </IconButton>
+          <br></br>
+          <br></br>
+          <Grid container spacing={2}>
+            <Grid item>
+              <Button variant="contained" onClick={handleAddEducation}>Add More</Button>
+          </Grid>
+          <Grid item>
           <Button type="submit" variant="contained" color="primary">
             Save
           </Button>
+          </Grid>
+          </Grid>
         </form>
       );
      
@@ -387,12 +468,22 @@ function ExperienceSection({exper}){
       };
     
       return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{width:'80%',marginLeft:'10%'}}>
           {experiences.map((experience, index) => (
             <div key={index}>
+              <Grid container spacing={2}>
+                <Grid item xs={11}>
               <Typography variant="h6">Experience {index + 1}</Typography>
+              </Grid>
+              <Grid item xs={1}>
+              <IconButton onClick={() => handleRemoveExperience(index)}>
+                <Delete />
+              </IconButton>
+              </Grid>
+              <Grid item xs={12}>
               <TextField
                 label="Title"
+                fullWidth
                 value={experience.title}
                 onChange={(event) =>
                   setExperiences([
@@ -403,7 +494,11 @@ function ExperienceSection({exper}){
                 }
                 required
               />
+              </Grid>
+              <Grid item xs={6}>
+
               <TextField
+              fullWidth
                 label="Start Year"
                 type="number"
                 value={experience.startYear}
@@ -415,8 +510,13 @@ function ExperienceSection({exper}){
                   ])
                 }
                 required
-              />
+                />
+                </Grid>
+
+              <Grid item xs={6}>
+
               <TextField
+              fullWidth
                 label="Start Month"
                 type="number"
                 value={experience.startMonth}
@@ -428,9 +528,16 @@ function ExperienceSection({exper}){
                   ])
                 }
                 required
-              />
+                />
+                </Grid>
+              <Grid item xs={12}>
               <Typography variant="body1">to</Typography>
+              </Grid>
+                
+              <Grid item xs={6}>
+
               <TextField
+              fullWidth
                 label="End Year"
                 type="number"
                 value={experience.endYear}
@@ -442,8 +549,12 @@ function ExperienceSection({exper}){
                   ])
                 }
                 required
-              />
+                />
+                </Grid>
+
+              <Grid item xs={6}>
               <TextField
+              fullWidth
                 label="End Month"
                 type="number"
                 value={experience.endMonth}
@@ -455,8 +566,14 @@ function ExperienceSection({exper}){
                   ])
                 }
                 required
-              />
+                />
+                </Grid>
+
+
+              <Grid item xs={6}>
+
               <TextField
+              fullWidth
                 label="Details"
                 multiline
                 required
@@ -469,22 +586,34 @@ function ExperienceSection({exper}){
                     ...experiences.slice(index + 1),
                   ])
                 }
-              />
-              <IconButton onClick={() => handleRemoveExperience(index)}>
-                <Delete />
-              </IconButton>
+                />
+                </Grid>
+
+
+              </Grid>
             </div>
           ))}
-          <IconButton onClick={handleAddExperience}>
-            <AddCircleOutline />
-          </IconButton>
+          <br></br>
+          <br></br>
+          <Grid container spacing={2}>
+            <Grid item>
+          
+               <Button onClick={handleAddExperience} variant="contained" color="primary">Add New</Button>
+          </Grid>
+
+          <Grid item>
           <Button type="submit" variant="contained" color="primary">
             Save
           </Button>
+          </Grid>
+          </Grid>
         </form>
       );
           
 }
+
+
+
 
 export default function Main(){
     const [data,setData]=useState()
@@ -496,7 +625,7 @@ export default function Main(){
       return <div></div>
     }
 
-    return (<Grid sx={{margin:'16px'}} container spacing={1}>
+    return (<Grid sx={{marginLeft:'12%',width:'75%',marginTop:'32px'}} container spacing={1}>
         <Grid item xs={12}><Typography variant="h5"><b>Picture Update Section:</b></Typography></Grid>
         <Grid item xs={12}><PictureSection img={data.img} portfolio={data.portfolio}/></Grid>
         <Grid item xs={12}></Grid>
