@@ -96,15 +96,10 @@ exports.signupuser=async(name,email,pass,userType)=>{
     }
 
 
-    exports.withdrawrequest=async(amount,number)=>{
-        
-    }
+   
 
     
 
-    exports.cashinrequest=async(amount,number,refarencenumber)=>{
-
-    }
 
     exports.getprojectdetails=async(projectid)=>{
         let res=await fetch(hostname+'/api/projectdetails',{ method: 'POST',
@@ -214,6 +209,65 @@ exports.sendmsg=async(projectid,msg)=>{
         }
     }
 
-   
+   exports.cashin=async(amount,number)=>{
+    let res=await fetch(hostname+'/api/cashin',{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({amount,number,'cookie':localStorage.getItem('cookie')}),
+    })
+    let da=await res.json();
+        if(da.status=='OK'){
+            alert('We will soon let you know!')
+            document.location='/'
+        }else{
+            alert(da.status);
+        }
+   }
+   exports.withdraw=async(amount,number)=>{
+    let res=await fetch(hostname+'/api/withdraw',{
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({amount,number,'cookie':localStorage.getItem('cookie')}),
+    })
+    let da=await res.json();
+        if(da.status=='OK'){
+            alert('We will soon let you know!')
+            document.location='/'
+        }else{
+            alert(da.status);
+        }
+   }
+    exports.loadbalence=async()=>{
+        let res=await fetch(hostname+'/api/loadb',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({'cookie':localStorage.getItem('cookie')}),
+        })
+        let da=await res.json();
+            if(da.status=='OK'){
+                return da.data;
+            }
+    }
 
-    
+    exports.videolist=async()=>{
+        let res=await fetch(hostname+'/api/videolist')
+        let da=await res.json();
+            if(da.status=='OK'){
+                return da.data;
+            }
+    }
+
+    exports.uploadvideo=async(link)=>{
+        let res=await fetch(hostname+'/api/uploadvideo',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({link,'cookie':localStorage.getItem('cookie')}),
+        })
+        let da=await res.json();
+            if(da.status=='OK'){
+                alert("Thank you for upload this video")
+                document.location.reload();
+            }else{
+                alert(da.status);
+            }
+    }

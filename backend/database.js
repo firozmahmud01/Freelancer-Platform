@@ -23,6 +23,8 @@ let con = mysql.createConnection({
     con.query("CREATE TABLE IF NOT EXISTS bidlist(uid INTEGER PRIMARY KEY AUTO_INCREMENT,price TEXT,time TEXT,details TEXT,profile TEXT,img TEXT,biddername TEXT,projectid TEXT);")
     con.query("CREATE TABLE IF NOT EXISTS messages(uid INTEGER PRIMARY KEY AUTO_INCREMENT,msg TEXT,time TEXT,sender TEXT,projectid TEXT);")
     con.query("CREATE TABLE IF NOT EXISTS userreview(uid INTEGER PRIMARY KEY AUTO_INCREMENT,comment TEXT,reviewer TEXT,reviewerprofile TEXT,review TEXT,profile TEXT);")
+    con.query("CREATE TABLE IF NOT EXISTS cash(uid INTEGER PRIMARY KEY AUTO_INCREMENT,amount TEXT,number TEXT,userid TEXT,type TEXT);")
+    con.query("CREATE TABLE IF NOT EXISTS videolist(uid INTEGER PRIMARY KEY AUTO_INCREMENT,link TEXT,uploadername TEXT,uploaderuid TEXT);")
     
     
   });
@@ -321,4 +323,36 @@ exports.acceptbidder=async(token,projectid,bidderprofile)=>{
   await getData('DELETE FROM bidlist WHERE projectid=?',[projectid,user[0].uid]);
   return 'OK'
 
+}
+
+
+exports.cashreq=async(type,amount,number,cookie)=>{
+  let user=await getData('SELECT uid FROM normaluser WHERE token=?;',[cookie]);
+  if(user.length<=0){
+    return;
+  }
+  await getData('INSERT INTO cash(userid,number,amount,type) VALUES(?,?,?,?)',[user[0].uid,number,amount,type])
+  return "OK";
+}
+
+
+exports.loadb=async(cookie)=>{
+  let user=await getData('SELECT balance FROM normaluser WHERE token=?;',[cookie]);
+  if(user.length<=0){
+    return;
+  }
+  return user[0].balance;
+}
+
+exports.videolist=async()=>{
+let data=await getData('SELECT * FROM videolist');
+return data;
+}
+exports.uploadvideo=async(cookie,link)=>{
+  let user=await getData('SELECT uid,name FROM normaluser WHERE token=?;',[cookie]);
+  if(user.length<=0){
+    return;
+  }
+  await getData('INSERT INTO videolist(uploadername,uploaderuid,link) VALUES(?,?,?)',[user[0].name,user[0].uid,link])
+  return "OK"
 }

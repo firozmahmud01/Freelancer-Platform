@@ -1,8 +1,65 @@
-import { Search } from "@mui/icons-material";
+import { Search, Upload } from "@mui/icons-material";
 import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, InputAdornment, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getprofiledetails, getprojectdetails, getprojectlist, uploadproject } from "./AllApi";
+import { getprofiledetails, getprojectdetails, getprojectlist, uploadproject, uploadvideo } from "./AllApi";
 
+
+function VideoButton(){
+  return <Fab color="primary" aria-label="add" variant="extended" sx={{color:'black',backgroundColor:'yellow',position:'fixed',bottom:'100px',right:'32px'}} onClick={()=>document.location='/videos'}>
+  Videos
+</Fab>
+}
+function UploadVideo(){
+const [open,setOpen]=useState(false);
+const [link,setLink]=useState('');
+const handleSubmit=()=>{
+  let data=link.split('=')
+  if(data.length<=1){
+    alert("Please insert a valid youtube link");
+    return ;
+  }
+  uploadvideo(data[data.length-1])
+  setOpen(false);
+}
+  return (
+    <div>
+  <Fab color="primary" aria-label="add" variant="extended" sx={{color:'black',backgroundColor:'yellow',position:'fixed',bottom:'32px',right:'32px'}} onClick={()=>setOpen(true)}>
+  + Video
+</Fab>
+
+<Dialog open={open} onClose={()=>setOpen(false)} aria-labelledby="add-project-dialog-title">
+        <DialogTitle id="add-project-dialog-title"><div style={{padding:'8px',paddingLeft:'16px',width:'100%',backgroundColor:'yellow',position:'absolute',top:'0',left:'0',right:'0'}}>Upload a video</div></DialogTitle>
+        <DialogContent >
+          <br></br>
+          <br></br>
+          <Grid container >
+            <Grid item xs={12}>
+          <TextField fullWidth label="Youtube Video Link" value={link} onChange={(event) => setLink(event.target.value)} margin="normal" />
+            </Grid>
+              
+    
+          </Grid>
+          
+        </DialogContent>
+        <DialogActions>
+          <Grid container spacing={2}>
+<Grid item xs={6}>
+          <Button fullWidth onClick={()=>setOpen(false)} sx={{backgroundColor:'yellow',color:'black'}} color="primary">
+            Cancel
+          </Button>
+</Grid>
+<Grid item xs={6}>
+
+          <Button fullWidth onClick={handleSubmit} sx={{backgroundColor:'yellow',color:'black'}} color="primary">
+            Upload
+          </Button>
+</Grid>
+          </Grid>
+        </DialogActions>
+      </Dialog>
+      </div>
+)
+}
 
 
 const AddProjectButton = () => {
@@ -170,6 +227,7 @@ export default function Main(){
       ))}
 </Grid>
       {(localStorage.getItem('userType')!='worker'&&<AddProjectButton/>)}
+      {(localStorage.getItem('userType')=='worker'?<UploadVideo/>:<VideoButton/>)}
     </div>
   );
 

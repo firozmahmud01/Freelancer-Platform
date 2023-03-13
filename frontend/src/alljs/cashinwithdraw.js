@@ -1,8 +1,10 @@
+import { cashin, withdraw } from "./AllApi";
+
 const { Button, Dialog, DialogTitle, DialogContent, DialogContentText, Typography, TextField } = require("@mui/material");
 const { useState } = require("react");
 
-function CashInOut() {
-  const [open, setOpen] = useState(false);
+export default function CashInOut({open,setOpen}) {
+  
   const [amount, setAmount] = useState('');
   const [txnNumber, setTxnNumber] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -18,21 +20,17 @@ function CashInOut() {
 
   const handleCashIn = () => {
     // submit cash in data to backend
-    console.log(`Cash in amount: ${amount}, txn number: ${txnNumber}`);
+    cashin(amount,txnNumber);
+
   };
 
   const handleWithdraw = () => {
     // submit withdraw data to backend
-    console.log(
-      `Withdraw amount: ${withdrawAmount}, account number: ${withdrawAccountNumber}`
-    );
+    withdraw(withdrawAmount,withdrawAccountNumber);
   };
 
   return (
-    <>
-      <Button variant="contained" color="primary" onClick={handleOpen}>
-        Cash In / Withdraw
-      </Button>
+    
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Cash In / Withdraw</DialogTitle>
         <DialogContent>
@@ -55,7 +53,7 @@ function CashInOut() {
               value={txnNumber}
               onChange={(e) => setTxnNumber(e.target.value)}
             />
-            <Button variant="contained" color="primary" onClick={handleCashIn}>
+            <Button sx={{backgroundColor:'yellow',color:'black'}} variant="contained" color="primary" onClick={handleCashIn}>
               Submit Cash In
             </Button>
             <Typography variant="subtitle1">Withdraw</Typography>
@@ -72,12 +70,12 @@ function CashInOut() {
               value={withdrawAccountNumber}
               onChange={(e) => setWithdrawAccountNumber(e.target.value)}
             />
-            <Button variant="contained" color="primary" onClick={handleWithdraw}>
+            <Button variant="contained" sx={{backgroundColor:'yellow',color:'black'}} onClick={handleWithdraw}>
               Submit Withdraw
             </Button>
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    
   );
 }

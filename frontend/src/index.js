@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import {BrowserRouter,Route,Routes} from 'react-router-dom'
 
@@ -6,6 +6,7 @@ import {BrowserRouter,Route,Routes} from 'react-router-dom'
 
 import AllWork from './alljs/allwork'
 import Inbox from './alljs/inbox'
+import Cashout from './alljs/cashinwithdraw'
 import OptionAndSkill from './alljs/optionandskillset'
 import Profile from './alljs/profile'
 import Login from './alljs/login'
@@ -21,11 +22,20 @@ import {AppBar, Avatar, Button, IconButton, ListItemIcon, Menu, MenuItem, Toolba
 import IconImage from './image/icon.png'
 import { AccountBalance, AccountCircle, AccountTree, Logout, Settings } from '@mui/icons-material';
 import { purple } from '@mui/material/colors';
+import { loadbalence } from './alljs/AllApi';
 
 
 function AvatarFunction(){
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const [balench,setBalence]=useState(0);
+  useEffect(()=>{
+    loadbalence().then(d=>{
+      if(d){
+        setBalence(d);
+      }
+    })
+  })
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -81,7 +91,7 @@ function AvatarFunction(){
   anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
 >
 <Typography sx={{margin:'16px'}}>
-    Balance:{localStorage.getItem('balance')}
+    Balance:{balench}
   </Typography>
   <MenuItem onClick={()=>{document.location='/profile/'+localStorage.getItem('profile')}}>
     <ListItemIcon>
@@ -89,7 +99,7 @@ function AvatarFunction(){
     </ListItemIcon>
     Profile
   </MenuItem>
-  <MenuItem onClick={()=>{document.location='/?q=myproject'}}>
+  {/* <MenuItem onClick={()=>{document.location='/?q=myproject'}}>
     <ListItemIcon>
       <AccountTree color='secondary' fontSize="small" />
     </ListItemIcon>
@@ -106,7 +116,7 @@ function AvatarFunction(){
       <AccountBalance color='secondary' fontSize="small" />
     </ListItemIcon>
     Cash In & Withdraw
-  </MenuItem>
+  </MenuItem> */}
   <MenuItem onClick={()=>{handleClose();localStorage.removeItem('cookie');localStorage.removeItem('user');document.location='/'}}>
     <ListItemIcon>
       <Logout color='secondary' fontSize="small" />
@@ -126,6 +136,7 @@ function AvatarFunction(){
 
 
 function TitleBarApp({appbar}){
+  const [open, setOpen] = useState(false);
   if(!localStorage.getItem('cookie')){
     return;
   }
@@ -138,8 +149,19 @@ function TitleBarApp({appbar}){
         
         <Typography sx={{cursor: 'pointer',color:'black' }} variant="h6" onClick={()=>document.location='/'} color={"inherit"}><b>24/7 Work</b></Typography>
         <div style={{marginLeft:'auto' ,right:'0px'}}>
+          <Cashout open={open} setOpen={setOpen}/>
             <AvatarFunction/>
             </div>
+            <IconButton color='secondary' onClick={()=>{document.location='/?q=myproject'}}>
+              <AccountTree />
+            </IconButton>
+            <IconButton color='secondary' onClick={()=>{document.location='/settings'}}>
+            <Settings />
+            </IconButton>
+            <IconButton color='secondary' onClick={()=>{setOpen(true)}}>
+            <AccountBalance />
+            </IconButton>
+
       </Toolbar>
     </AppBar>
   )
@@ -181,6 +203,8 @@ function LinkChecker({setAppBar}){
     <Route path='/work/apply' element={<WorkApplication setAppBar={setAppBar}/>} >
   
     </Route>
+    
+    
     <Route path='/project' element={<WorkDetails setAppBar={setAppBar}/>} ></Route>
     
     <Route path="*" element={<NotFound setAppBar={setAppBar}/>}/>

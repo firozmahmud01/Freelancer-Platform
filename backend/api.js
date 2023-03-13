@@ -1,5 +1,5 @@
 const express=require('express');
-const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails, requestbit, acceptbidder, loadmessage, sendmessage, submitreview } = require('./database');
+const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails, requestbit, acceptbidder, loadmessage, sendmessage, submitreview, cashreq, loadb, videolist, uploadvideo } = require('./database');
 const r=express.Router()
 module.exports= r;
 
@@ -182,4 +182,92 @@ res.json({status:'OK'});
     res.json({status:'Failed to submit'});
 }
 
+    })
+
+
+
+    r.post('/cashin',async(req,res)=>{
+        let {amount,number,cookie}=req.body;
+        if(!amount||!number||!cookie){
+            res.json({status:"failed to work"});
+            return ;
+        }
+
+        let data=await cashreq('cashin',amount,number,cookie);
+if(data){
+    res.json({status:"OK"});
+}else{
+    res.json({status:'Failed to upload because of invalid user!'})
+}
+        
+    })
+    
+
+
+
+    r.post('/withdraw',async(req,res)=>{
+        let {amount,number,cookie}=req.body;
+        if(!amount||!number||!cookie){
+            res.json({status:"failed to work"});
+            return ;
+        }
+
+        let data=await cashreq('withdraw',amount,number,cookie);
+if(data){
+    res.json({status:"OK"});
+}else{
+    res.json({status:'Failed to upload because of invalid user!'})
+}
+        
+    })
+
+
+
+    r.post('/loadb',async(req,res)=>{
+        let {cookie}=req.body
+        if(!cookie){
+            res.json({status:'Failed to work!'})
+            return ;
+        }
+
+
+        let data=await loadb(cookie);
+if(data){
+    res.json({status:"OK",data});
+}else{
+    res.json({status:'OK','data':0})
+}
+        
+    })
+
+
+    r.get('/videolist',async(req,res)=>{
+        
+        let data=await videolist();
+if(data){
+    res.json({status:"OK",data});
+}else{
+    res.json({status:'Failed to load!'})
+}
+        
+    })
+
+
+
+
+    r.post('/uploadvideo',async(req,res)=>{
+        let {cookie,link}=req.body
+        if(!cookie||!link){
+            res.json({status:'Failed to work!'})
+            return ;
+        }
+
+
+        let data=await uploadvideo(cookie,link);
+if(data){
+    res.json({status:"OK",data});
+}else{
+    res.json({status:'Failed to load!'})
+}
+        
     })
