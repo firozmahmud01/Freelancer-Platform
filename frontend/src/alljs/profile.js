@@ -1,4 +1,4 @@
-import { Avatar, Card, CardMedia, Grid, Paper, Typography } from "@mui/material";
+import { Avatar, Button, Card, CardMedia, Grid, Paper, Typography } from "@mui/material";
 import { useState } from "react"
 import { getprofiledetails, hostname } from "./AllApi"
 import ProfileBackPic from '../image/profileback.jpg'
@@ -20,7 +20,7 @@ export default function Main(){
     getprofiledetails(profile).then(da=>{
       if(!da?.education&&localStorage.getItem('profile')==profile){
         alert('Please comple your profile!');
-        document.location='/settings'
+        document.location='/profile/edit'
         return ;
       }
       setData(da);
@@ -32,7 +32,7 @@ export default function Main(){
       <CardMedia sx={{height:'350px'}} image={ProfileBackPic}></CardMedia>
     </Card>
     <div style={{width:'60%',marginLeft:'20%',backgroundColor:'white',padding:'32px',height:'200px',position:'absolute',top:'210px'}}>
-    <ProfileUpper img={data?.img} name={data?.name} jobtitle={data?.skills} address={data?.address} details={data?.details} hourlyrate={data?.hourlyrate}/>
+    <ProfileUpper profile={profile} img={data?.img} name={data?.name} jobtitle={data?.skills} address={data?.address} details={data?.details} hourlyrate={data?.hourlyrate}/>
       
     <Paper elevation={3} sx={{padding:'16px',margin:'32px'}}>
         <Typography variant="h6"><b>Portfolio Items</b></Typography>
@@ -139,7 +139,7 @@ function ReviewItem({rating,name,review}){
 }
 
 
-function ProfileUpper({img,name,jobtitle,address,details,hourlyrate}){
+function ProfileUpper({profile,img,name,jobtitle,address,details,hourlyrate}){
   return (
     <Grid container spacing={3}>
       <Grid item xs={2}>
@@ -151,12 +151,15 @@ function ProfileUpper({img,name,jobtitle,address,details,hourlyrate}){
         <Typography variant="h6">{address}</Typography>
       </Grid>
 
-      <Grid item xs={10}>
+      <Grid item xs={9}>
         <Typography variant="h4">{name}</Typography>
         <Typography>{jobtitle}</Typography>
         <br></br>
         <br></br>
         <Typography variant="h6"> {details}</Typography>
+      </Grid>
+      <Grid item xs={1}>
+      {localStorage.getItem('profile')==profile&&<Button onClick={()=>document.location='/profile/edit'} variant="contained">Edit</Button>}
       </Grid>
 
     

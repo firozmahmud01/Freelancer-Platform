@@ -1,7 +1,7 @@
 import { Search, Upload } from "@mui/icons-material";
 import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, Dialog, DialogActions, DialogContent, DialogTitle, Fab, Grid, InputAdornment, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getprofiledetails, getprojectdetails, getprojectlist, uploadproject, uploadvideo } from "./AllApi";
+import { getprofiledetails, getprojectdetails, getprojectlist, sendlike, uploadproject, uploadvideo } from "./AllApi";
 
 
 function VideoButton(){
@@ -204,7 +204,8 @@ export default function Main(){
 
       <Grid item xs={1}></Grid>
       {filteredProjects.map((project) => (
-        <Grid key={project.uid} item xs={3}>
+      
+        <Grid key={project.uid} item xs={12} sx={{marginLeft:'10%',marginRight:'10%'}}>
         <Card elevation={10} sx={{maxWidth:'100%'}}>
           <CardHeader
             title={project.title}
@@ -212,8 +213,6 @@ export default function Main(){
           />
           <CardContent>
             <Typography variant="body1">{project.details.substring(0,project.details.length>60?60:project.details.length)+'...'}</Typography>
-            </CardContent>
-            <CardActions>
             <Button
             sx={{color:'yellow'}}
               
@@ -221,6 +220,12 @@ export default function Main(){
             >
               Open Details
             </Button>
+            </CardContent>
+
+            <CardActions>
+            <Typography>{project.likes} Likes</Typography>
+            <Button onClick={()=>sendlike(project.uid)}>Like</Button>
+            <Button onClick={()=>document.location='/comments?pid='+project.uid}>Comments</Button>
             </CardActions>
         </Card>
         </Grid>

@@ -271,3 +271,93 @@ exports.sendmsg=async(projectid,msg)=>{
                 alert(da.status);
             }
     }
+
+
+    exports.sendlike=async(pid)=>{
+        if(!localStorage.getItem('cookie')){
+            alert('please login first!');
+            return;
+        }
+
+        let res=await fetch(hostname+'/api/sendlike',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({pid,'cookie':localStorage.getItem('cookie')}),
+        })
+        let da=await res.json();
+            if(da.status=='OK'){
+                document.location.reload();
+            }else{
+                alert(da.status);
+            }
+    }
+
+
+
+    exports.sendcomment=async(pid,comment)=>{
+        if(!localStorage.getItem('cookie')){
+            alert('please login first!');
+            return;
+        }
+
+        let res=await fetch(hostname+'/api/sendcomment',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({pid,'cookie':localStorage.getItem('cookie'),comment}),
+        })
+        let da=await res.json();
+            if(da.status=='OK'){
+                document.location.reload();
+            }else{
+                alert(da.status);
+            }
+    }
+
+
+
+    exports.loadallcomment=async(pid)=>{
+        if(!localStorage.getItem('cookie')){
+            alert('please login first!');
+            return;
+        }
+
+        let res=await fetch(hostname+'/api/loadcomment',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({pid}),
+        })
+        let da=await res.json();
+            if(da.status=='OK'){
+                return da.data;
+            }else{
+                alert(da.status);
+            }
+            return 'failed';
+    }
+
+
+
+
+
+
+
+
+    exports.loadnotification=async()=>{
+        if(!localStorage.getItem('cookie')){
+            alert('please login first!');
+            return;
+        }
+
+        let res=await fetch(hostname+'/api/loadnotification',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({'cookie':localStorage.getItem('cookie')}),
+        })
+        let da=await res.json();
+            if(da.status=='OK'){
+                return da.data;
+            }else{
+                alert(da.status);
+            }
+            return 'failed';
+    }

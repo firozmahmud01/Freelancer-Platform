@@ -25,7 +25,10 @@ let con = mysql.createConnection({
     con.query("CREATE TABLE IF NOT EXISTS userreview(uid INTEGER PRIMARY KEY AUTO_INCREMENT,comment TEXT,reviewer TEXT,reviewerprofile TEXT,review TEXT,profile TEXT);")
     con.query("CREATE TABLE IF NOT EXISTS cash(uid INTEGER PRIMARY KEY AUTO_INCREMENT,amount TEXT,number TEXT,userid TEXT,type TEXT);")
     con.query("CREATE TABLE IF NOT EXISTS videolist(uid INTEGER PRIMARY KEY AUTO_INCREMENT,link TEXT,uploadername TEXT,uploaderuid TEXT);")
-    
+    con.query("CREATE TABLE IF NOT EXISTS likelist(uid INTEGER PRIMARY KEY AUTO_INCREMENT,name TEXT,userid TEXT,projectid TEXT);")
+    con.query("CREATE TABLE IF NOT EXISTS commentlist(uid INTEGER PRIMARY KEY AUTO_INCREMENT,name TEXT,userid TEXT,projectid TEXT,comment TEXT,profile TEXT);")
+    con.query("CREATE TABLE IF NOT EXISTS notification(uid INTEGER PRIMARY KEY AUTO_INCREMENT,projectname TEXT,details TEXT,projectid TEXT,userid TEXT);")
+
     
   });
 
@@ -240,7 +243,29 @@ for(let i of attachments){
   let name=await saveimage(i);
   imgs.push(name);
 }
-  await getData('INSERT INTO projects(title,details,pricerange,requirements,attachments,publishername,publisheruid) VALUES(?,?,?,?,?,?,?)',[title,details,pricerange,requirements,JSON.stringify(imgs),getd[0].name,getd[0].uid])
+await getData('INSERT INTO projects(title,details,pricerange,requirements,attachments,publishername,publisheruid) VALUES(?,?,?,?,?,?,?)',[title,details,pricerange,requirements,JSON.stringify(imgs),getd[0].name,getd[0].uid])
+let pid=await getData('SELECT uid FROM projects WHERE title=? AND details=? AND pricerange=? AND requirements=? AND attachments=? AND publishername=? AND publisheruid=?',[title,details,pricerange,requirements,JSON.stringify(imgs),getd[0].name,getd[0].uid])
+if(pid.length<=0)return;
+
+let skills=requirements.split(',')
+if(skills.length>=1){
+  let cmdplus=''
+for(let i=0;i<skills.length;i++){
+  skills[i]="%"+skills[i]+"%"
+  if(i==0){
+  cmdplus+='skills LIKE ? '
+  }else{
+    cmdplus+='OR skills LIKE ? '
+  }
+}
+  let people=await getData('SELECT uid FROM normaluser WHERE '+cmdplus,[skills]);
+  if(people.length>0){
+    for(let p of people){
+      await getData('INSERT INTO notification(projectname,details,projectid,userid) VALUES(?,?,?,?)',[title,details,pid[0].uid,p.uid])
+    }
+  }
+
+}
 return 'OK';
 }
 
@@ -256,6 +281,10 @@ exports.getProjectlist=async(token)=>{
     prm.push(da[0].profile)
   }
   let da=await getData(cmd,prm)
+  for(let i=0;i<da.length;i++){
+    let likes=await countlike(da[i].uid);
+    da[i].likes=likes;
+  }
   return da;
 
 
@@ -355,4 +384,53 @@ exports.uploadvideo=async(cookie,link)=>{
   }
   await getData('INSERT INTO videolist(uploadername,uploaderuid,link) VALUES(?,?,?)',[user[0].name,user[0].uid,link])
   return "OK"
+}
+
+
+exports.uploadlike=async(cookie,pid)=>{
+  let user=await getData('SELECT uid,name FROM normaluser WHERE token=?;',[cookie]);
+  if(user.length<=0){
+    return;
+  }
+  let data=await getData('SELECT * FROM likelist WHERE userid=? AND projectid=?',[user[0].uid,pid])
+  if(data.length>0){
+    await getData('DELETE FROM likelist WHERE userid=? AND projectid=?',[user[0].uid,pid]);
+  }else{
+    await getData('INSERT INTO likelist(name,userid,projectid) VALUES(?,?,?)',[user[0].name,user[0].uid,pid])
+  }
+  return "OK"
+}
+
+async function countlike(pid){
+  let like=await getData('SELECT * FROM likelist WHERE projectid=?',[pid])
+  return like.length;
+}
+
+exports.commentlist=async(pid)=>{
+  let like=await getData('SELECT * FROM commentlist WHERE projectid=?',[pid])
+  return like;
+}
+
+
+exports.sendcomment=async(cookie,pid,comment)=>{
+  let user=await getData('SELECT uid,name,profile FROM normaluser WHERE token=?;',[cookie]);
+  if(user.length<=0){
+    return;
+  }
+  
+  await getData('INSERT INTO commentlist(name,userid,projectid,comment,profile) VALUES(?,?,?,?,?)',[user[0].name,user[0].uid,pid,comment,user[0].profile])
+  
+  return "OK"
+}
+
+
+exports.loadnotification=async(cookie)=>{
+  let user=await getData('SELECT uid,name,profile FROM normaluser WHERE token=?;',[cookie]);
+  if(user.length<=0){
+    return;
+  }
+  
+  let data=await getData('SELECT * FROM notification WHERE userid=?',[user[0].uid])
+  
+  return data;
 }

@@ -1,5 +1,5 @@
 const express=require('express');
-const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails, requestbit, acceptbidder, loadmessage, sendmessage, submitreview, cashreq, loadb, videolist, uploadvideo } = require('./database');
+const { checkauth, createUser, getfoodlist, getfooddetails, getbabysitterdetails, getbabysitteritem, uploadfood, getProfileDetails, updateProfilePicture, updateProfile, uploadProjects, getProjectlist, getProjectDetails, requestbit, acceptbidder, loadmessage, sendmessage, submitreview, cashreq, loadb, videolist, uploadvideo, uploadlike, sendcomment, commentlist, loadnotification } = require('./database');
 const r=express.Router()
 module.exports= r;
 
@@ -264,6 +264,92 @@ if(data){
 
 
         let data=await uploadvideo(cookie,link);
+if(data){
+    res.json({status:"OK",data});
+}else{
+    res.json({status:'Failed to load!'})
+}
+        
+    })
+
+
+
+
+
+
+    r.post('/sendlike',async(req,res)=>{
+        let {cookie,pid}=req.body
+        if(!cookie||!pid){
+            res.json({status:'Failed to work!'})
+            return ;
+        }
+
+
+        let data=await uploadlike(cookie,pid);
+if(data){
+    res.json({status:"OK",data});
+}else{
+    res.json({status:'Failed to load!'})
+}
+        
+    })
+
+
+
+
+    r.post('/sendcomment',async(req,res)=>{
+        let {cookie,pid,comment}=req.body
+        if(!cookie||!pid||!comment){
+            res.json({status:'Failed to work!'})
+            return ;
+        }
+
+
+        let data=await sendcomment(cookie,pid,comment);
+if(data){
+    res.json({status:"OK",data});
+}else{
+    res.json({status:'Failed to load!'})
+}
+        
+    })
+
+
+
+
+    r.post('/loadcomment',async(req,res)=>{
+        let {pid}=req.body
+        if(!pid){
+            res.json({status:'Failed to work!'})
+            return ;
+        }
+
+
+        let data=await commentlist(pid);
+if(data){
+    res.json({status:"OK",data});
+}else{
+    res.json({status:'Failed to load!'})
+}
+        
+    })
+
+
+
+
+
+
+
+
+    r.post('/loadnotification',async(req,res)=>{
+        let {cookie}=req.body
+        if(!cookie){
+            res.json({status:'Failed to work!'})
+            return ;
+        }
+
+
+        let data=await loadnotification(cookie);
 if(data){
     res.json({status:"OK",data});
 }else{

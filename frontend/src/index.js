@@ -6,6 +6,8 @@ import {BrowserRouter,Route,Routes} from 'react-router-dom'
 
 import AllWork from './alljs/allwork'
 import Inbox from './alljs/inbox'
+import NotificationPage from './alljs/notificationpage'
+import Comments from './alljs/commentlist'
 import Cashout from './alljs/cashinwithdraw'
 import OptionAndSkill from './alljs/optionandskillset'
 import Profile from './alljs/profile'
@@ -20,7 +22,7 @@ import NotFound from './alljs/NotFound'
 import HomePageChooser from './alljs/homepagechooser'
 import {AppBar, Avatar, Button, IconButton, ListItemIcon, Menu, MenuItem, Toolbar, Typography} from '@mui/material'
 import IconImage from './image/icon.png'
-import { AccountBalance, AccountCircle, AccountTree, Logout, Settings } from '@mui/icons-material';
+import { AccountBalance, AccountCircle, AccountTree, Logout, Notifications, Settings } from '@mui/icons-material';
 import { purple } from '@mui/material/colors';
 import { loadbalence } from './alljs/AllApi';
 
@@ -28,14 +30,7 @@ import { loadbalence } from './alljs/AllApi';
 function AvatarFunction(){
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const [balench,setBalence]=useState(0);
-  useEffect(()=>{
-    loadbalence().then(d=>{
-      if(d){
-        setBalence(d);
-      }
-    })
-  })
+  
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -91,11 +86,11 @@ function AvatarFunction(){
   anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
 >
 <Typography sx={{margin:'16px'}}>
-    Balance:{balench}
+    
   </Typography>
   <MenuItem onClick={()=>{document.location='/profile/'+localStorage.getItem('profile')}}>
     <ListItemIcon>
-      <AccountCircle color='secondary' fontSize="small" />
+      
     </ListItemIcon>
     Profile
   </MenuItem>
@@ -117,9 +112,9 @@ function AvatarFunction(){
     </ListItemIcon>
     Cash In & Withdraw
   </MenuItem> */}
-  <MenuItem onClick={()=>{handleClose();localStorage.removeItem('cookie');localStorage.removeItem('user');document.location='/'}}>
+  <MenuItem >
     <ListItemIcon>
-      <Logout color='secondary' fontSize="small" />
+      
     </ListItemIcon>
     Logout
   </MenuItem>
@@ -136,6 +131,14 @@ function AvatarFunction(){
 
 
 function TitleBarApp({appbar}){
+  const [balench,setBalence]=useState(0);
+  useEffect(()=>{
+    loadbalence().then(d=>{
+      if(d){
+        setBalence(d);
+      }
+    })
+  })
   const [open, setOpen] = useState(false);
   if(!localStorage.getItem('cookie')){
     return;
@@ -150,18 +153,27 @@ function TitleBarApp({appbar}){
         <Typography sx={{cursor: 'pointer',color:'black' }} variant="h6" onClick={()=>document.location='/'} color={"inherit"}><b>24/7 Work</b></Typography>
         <div style={{marginLeft:'auto' ,right:'0px'}}>
           <Cashout open={open} setOpen={setOpen}/>
-            <AvatarFunction/>
+            {/* <AvatarFunction/> */}
             </div>
+            <IconButton onClick={()=>{document.location='/profile/'+localStorage.getItem('profile')}}>
+              <AccountCircle sx={{color:'white'}}/>
+            </IconButton>
             <IconButton color='secondary' onClick={()=>{document.location='/?q=myproject'}}>
-              <AccountTree />
+              <AccountTree sx={{color:'white'}}/>
             </IconButton>
-            <IconButton color='secondary' onClick={()=>{document.location='/settings'}}>
+            <IconButton color='secondary' onClick={()=>{document.location='/notification'}}>
+              <Notifications sx={{color:'white'}}/>
+            </IconButton>
+            {/* <IconButton color='secondary' onClick={()=>{document.location='/settings'}}>
             <Settings />
-            </IconButton>
+            </IconButton> */}
             <IconButton color='secondary' onClick={()=>{setOpen(true)}}>
-            <AccountBalance />
+            <AccountBalance sx={{color:'white'}}/>
             </IconButton>
-
+            <IconButton onClick={()=>{localStorage.removeItem('cookie');localStorage.removeItem('user');document.location='/'}}>
+              <Logout sx={{color:'white'}}/>
+            </IconButton>
+            <Typography color={'black'}>Balance:{balench}</Typography>
       </Toolbar>
     </AppBar>
   )
@@ -181,7 +193,7 @@ function LinkChecker({setAppBar}){
     <Route path='/work' element={<AllWork setAppBar={setAppBar}/>}>
   
     </Route>
-    <Route path='/settings' element={<SettingsPage setAppBar={setAppBar}/>}>
+    <Route path='/profile/edit' element={<SettingsPage setAppBar={setAppBar}/>}>
   
     </Route>
 
@@ -197,7 +209,13 @@ function LinkChecker({setAppBar}){
     <Route path='/upload' element={<UploadPost setAppBar={setAppBar}/>} >
       
     </Route>
+    <Route path='/comments' element={<Comments/>} >
+      
+    </Route>
     <Route path='/videos' element={<VideoPage setAppBar={setAppBar}/>} >
+  
+    </Route>
+    <Route path='/notification' element={<NotificationPage setAppBar={setAppBar}/>} >
   
     </Route>
     <Route path='/work/apply' element={<WorkApplication setAppBar={setAppBar}/>} >

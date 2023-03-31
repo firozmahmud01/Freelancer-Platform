@@ -10,9 +10,9 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import {Typography, Grid, IconButton, Card, CardMedia, Button, TextField, Select, ListItem, MenuItem} from '@mui/material';
+import {Typography, Grid, IconButton, Card, CardMedia, Button, TextField, Select, ListItem, MenuItem, Avatar} from '@mui/material';
 import {Facebook, Google, Opacity, Twitter, YouTube} from '@mui/icons-material';
-
+import Logo from '../image/icon.png'
 import { loginuser, signupuser } from './AllApi';
 
 import SideImage from '../image/sideimage.png'
@@ -81,7 +81,10 @@ function LoginScreen({setType}){
 return (     
 <div style={{marginTop:'50%',marginRight:'16px' ,transform:'translateY(-50%)' ,marginLeft:'16px'}}>
         <div style={{textAlign:'end'}}>
-        <Typography sx={{cursor:'pointer'}} variant={'h6'} onClick={()=>{setType('default')}}>{'<'} Go to home</Typography>
+            <IconButton>
+                <Avatar onClick={()=>{setType('default')}} src={Logo}></Avatar>
+            </IconButton>
+        {/* <Typography sx={{cursor:'pointer'}} variant={'h6'} onClick={()=>{setType('default')}}>{'<'} Go to home</Typography> */}
         <Typography variant='h2' color={"yellow"} ><b>Login</b></Typography>
         
         </div>
