@@ -205,8 +205,8 @@ export default function Main(){
       <Grid item xs={1}></Grid>
       {filteredProjects.map((project) => (
       
-        <Grid key={project.uid} item xs={12} sx={{marginLeft:'10%',marginRight:'10%'}}>
-        <Card elevation={10} sx={{maxWidth:'100%'}}>
+        <Grid key={project.uid} item xs={12}>
+        <Card elevation={10} sx={{marginLeft:'50%',transform:'translateX(-50%)',width:'65%'}}>
           <CardHeader
             title={project.title}
             subheader={`Published by ${project.publishername}`}
@@ -226,6 +226,7 @@ export default function Main(){
             <Typography>{project.likes} Likes</Typography>
             <Button onClick={()=>sendlike(project.uid)}>Like</Button>
             <Button onClick={()=>document.location='/comments?pid='+project.uid}>Comments</Button>
+            <Button >Share</Button>
             </CardActions>
         </Card>
         </Grid>

@@ -24,7 +24,7 @@ import {AppBar, Avatar, Button, IconButton, ListItemIcon, Menu, MenuItem, Toolba
 import IconImage from './image/icon.png'
 import { AccountBalance, AccountCircle, AccountTree, Logout, Notifications, Settings } from '@mui/icons-material';
 import { purple } from '@mui/material/colors';
-import { loadbalence } from './alljs/AllApi';
+import { hostname, loadbalence } from './alljs/AllApi';
 
 
 function AvatarFunction(){
@@ -47,7 +47,7 @@ function AvatarFunction(){
     aria-haspopup="true"
     aria-expanded={open ? 'true' : undefined}
   >
-  <Avatar color="primary" sx={{ bgcolor: purple[500] }}>{(()=>{let x='';let name=localStorage.getItem('name').split(' ');for(let i=0;i<name.length&&i<2;i++){x+=name[i][0]}return x;})()}</Avatar>
+  <Avatar sx={{ bgcolor: purple[500] }} src={hostname+'/images/'+localStorage.getItem('profile')+".jpg"}></Avatar>
   </IconButton>
 
 <Menu
@@ -88,36 +88,13 @@ function AvatarFunction(){
 <Typography sx={{margin:'16px'}}>
     
   </Typography>
-  <MenuItem onClick={()=>{document.location='/profile/'+localStorage.getItem('profile')}}>
-    <ListItemIcon>
-      
-    </ListItemIcon>
-    Profile
+  <MenuItem onClick={()=>{localStorage.removeItem('cookie');localStorage.removeItem('user');document.location='/'}}>
+  <IconButton >
+              <Logout/>
+            </IconButton>
+              Logout
   </MenuItem>
-  {/* <MenuItem onClick={()=>{document.location='/?q=myproject'}}>
-    <ListItemIcon>
-      <AccountTree color='secondary' fontSize="small" />
-    </ListItemIcon>
-    My Projects
-  </MenuItem>
-  <MenuItem onClick={()=>{document.location='/settings'}}>
-    <ListItemIcon>
-      <Settings color='secondary' fontSize="small" />
-    </ListItemIcon>
-    Settings
-  </MenuItem>
-  <MenuItem onClick={()=>{}}>
-    <ListItemIcon>
-      <AccountBalance color='secondary' fontSize="small" />
-    </ListItemIcon>
-    Cash In & Withdraw
-  </MenuItem> */}
-  <MenuItem >
-    <ListItemIcon>
-      
-    </ListItemIcon>
-    Logout
-  </MenuItem>
+
 </Menu>
 </div>
 
@@ -153,7 +130,7 @@ function TitleBarApp({appbar}){
         <Typography sx={{cursor: 'pointer',color:'black' }} variant="h6" onClick={()=>document.location='/'} color={"inherit"}><b>24/7 Work</b></Typography>
         <div style={{marginLeft:'auto' ,right:'0px'}}>
           <Cashout open={open} setOpen={setOpen}/>
-            {/* <AvatarFunction/> */}
+            
             </div>
             <IconButton onClick={()=>{document.location='/profile/'+localStorage.getItem('profile')}}>
               <AccountCircle sx={{color:'white'}}/>
@@ -170,9 +147,8 @@ function TitleBarApp({appbar}){
             <IconButton color='secondary' onClick={()=>{setOpen(true)}}>
             <AccountBalance sx={{color:'white'}}/>
             </IconButton>
-            <IconButton onClick={()=>{localStorage.removeItem('cookie');localStorage.removeItem('user');document.location='/'}}>
-              <Logout sx={{color:'white'}}/>
-            </IconButton>
+            <AvatarFunction/>
+            
             <Typography color={'black'}>Balance:{balench}</Typography>
       </Toolbar>
     </AppBar>
